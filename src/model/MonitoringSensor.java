@@ -103,4 +103,29 @@ public class MonitoringSensor extends Sensor {
         System.out.println("  Numero allarmi: " + alarmCount);
         System.out.println("  Storico allarmi: " + alarmHistory);
     }
+
+    // Imposta se il sensore è attivo (allarme in corso)
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    // Imposta il valore della soglia
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
+    // Imposta il numero di allarmi già scattati
+    public void setAlarmCount(int alarmCount) {
+        this.alarmCount = alarmCount;
+    }
+
+    // Imposta lo storico degli allarmi (lista di LocalDateTime)
+    public void setAlarmHistory(List<LocalDateTime> alarmHistory) {
+        this.alarmHistory = new ArrayList<>(alarmHistory);
+    }
+
+    // Imposta l'ultima data di allarme
+    public void setLastAlarmTime(LocalDateTime lastAlarmTime) {
+        this.lastAlarmTime = lastAlarmTime;
+    }
 }

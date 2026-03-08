@@ -75,4 +75,19 @@ public class InterventionSensor extends Sensor {
         System.out.println("  Numero attivazioni: " + activationCount);
         System.out.println("  Storico attivazioni: " + activationHistory);
     }
+
+    // Imposta se il sensore di intervento è attivo
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    // Imposta il numero di attivazioni
+    public void setNumberOfActivations(int activationCount) {
+        this.activationCount = activationCount;
+    }
+
+    // Imposta lo storico delle attivazioni
+    public void setActivationHistory(List<LocalDateTime> activationHistory) {
+        this.activationHistory = new ArrayList<>(activationHistory);
+    }
 }

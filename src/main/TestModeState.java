@@ -52,10 +52,6 @@ public class TestModeState extends SystemState {
 
             if (!allModules.isEmpty()) {
                 System.out.println("  Moduli installati: " + String.join(", ", allModules));
-
-                if (s instanceof SensorDecorator decorator2) {
-                    System.out.println("  Dati moduli: " + decorator2.getModuleData());
-                }
             }
         }
     }

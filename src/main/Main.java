@@ -1,17 +1,31 @@
 package main;
 
 import java.util.*;
+import data.*;
+import model.Sensor;
 
 public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);
+
     static void main() {
 
         // ===== Creazione sistema =====
         HomeSystem system = new HomeSystem();
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            System.out.println("ERRORE FATALE: " + throwable.getMessage());
+            System.out.println("Salvataggio dati prima di terminare...");
+            FileManager.saveSensors(system.getSensors());
+            FileManager.saveStatistics(system.getSensors());
+            throwable.printStackTrace();
+        });
 
-        // ⚠️ Imposta stato iniziale su Collaudo
-        system.setState(new TestModeState());
+        // 1️⃣ Caricamento sensori
+        List<Sensor> sensors = FileManager.loadSensors();
+        system.setSensors(sensors);
+        system.rebuildMonitoringPairs();
+        // 2️⃣ Caricamento statistiche
+        FileManager.loadStatistics(sensors);
 
         boolean exit = false;
 
@@ -27,7 +41,11 @@ public class Main {
             switch (choice) {
                 case 1 -> testMode(system);
                 case 2 -> activeMode(system);
-                case 0 -> exit = true;
+                case 0 -> {
+                    FileManager.saveSensors(system.getSensors());
+                    FileManager.saveStatistics(system.getSensors());
+                    exit = true;
+                }
                 default -> System.out.println("Scelta non valida.");
             }
         }
@@ -70,7 +88,7 @@ public class Main {
             System.out.println("\n--- MODALITÀ COLLAUDO ---");
             System.out.println("1. Installa nuovi sensori");
             System.out.println("2. Mostra sensori installati");
-            System.out.println("3. Reset sensori");
+            System.out.println("3. Reset");
             System.out.println("4. Aggiungi modulo a un sensore");
             System.out.println("5. Mostra statistiche sensori");
             System.out.println("0. Torna indietro");
@@ -216,8 +234,9 @@ public class Main {
 
         while (!back) {
             System.out.println("\n--- RESET SENSORI ---");
-            System.out.println("1. Reset singolo sensore (base + moduli)");
-            System.out.println("2. Reset tutti i sensori (base + moduli)");
+            System.out.println("1. Reset singolo sensore");
+            System.out.println("2. Reset tutti i sensori");
+            System.out.println("3. Cancellazione Totale");
             System.out.println("0. Torna indietro");
             System.out.print("Scelta: ");
 
@@ -258,6 +277,11 @@ public class Main {
                 case 2 -> {
                     system.resetSensors(); // HomeSystem gestisce tutto internamente
                     System.out.println("Tutti i sensori e moduli sono stati resettati.");
+                }
+
+                case 3-> {
+                    FileManager.clearDataFiles();
+                    System.out.println("Sistema resettato.");
                 }
 
                 case 0 -> back = true;

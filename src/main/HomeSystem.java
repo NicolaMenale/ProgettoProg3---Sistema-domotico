@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-
+import data.*;
 import decorator.SensorDecorator;
 import factory.SensorFactory;
 import factory.SensorFactoryProvider;
@@ -282,6 +282,8 @@ public class HomeSystem {
 
         processAlarms();
         processStopAlarms();
+        FileManager.saveSensors(sensors);
+        FileManager.saveStatistics(sensors);
     }
 
     public void notifyAlarm(Sensor monitor) {
@@ -387,13 +389,49 @@ public class HomeSystem {
     public void setActiveMode() {
         System.out.println("Modalità Attivato: tutti i sensori di monitoraggio attivi.");
 
-        for (Sensor s : sensors) {
-            s.setModeString("ONLINE");
+        for (Sensor monitor : monitoringToIntervention.keySet()) {
+
+            Sensor intervention = monitoringToIntervention.get(monitor);
+
+            Sensor baseMonitor = getBaseSensor(monitor);
+            Sensor baseIntervention = getBaseSensor(intervention);
+
+            monitor.setModeString("ONLINE");
+            intervention.setModeString("ONLINE");
+
+            if (baseMonitor instanceof MonitoringSensor ms &&
+                    baseIntervention instanceof InterventionSensor is) {
+
+                // se esiste almeno un allarme → la coppia è attiva
+                boolean active = !ms.getAlarmHistory().isEmpty();
+
+                ms.setActive(active);
+                is.setActive(active);
+            }
         }
 
-        // Pulizia delle code per evitare messaggi "fantasma"
         alarmQueue.clear();
         stopAlarmQueue.clear();
     }
 
+    public void setSensors(List<Sensor> sensors) {
+        this.sensors = sensors;
+    }
+
+    public void rebuildMonitoringPairs() {
+        List<Sensor> monitoringSensors = new ArrayList<>();
+        List<Sensor> interventionSensors = new ArrayList<>();
+        for (Sensor s : sensors) {
+            Sensor base = getBaseSensor(s);
+
+            if (base instanceof MonitoringSensor) {
+                monitoringSensors.add(s);
+            } else if (base instanceof InterventionSensor) {
+                interventionSensors.add(s);
+            }
+        }
+        for (int i = 0; i < Math.min(monitoringSensors.size(), interventionSensors.size()); i++) {
+            addMonitoringPair(monitoringSensors.get(i), interventionSensors.get(i));
+        }
+    }
 }

@@ -2,18 +2,17 @@ package decorator;
 
 import model.Sensor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class SensorDecorator extends Sensor {
 
     protected Sensor wrappedSensor;
     protected List<String> modules; // lista dei moduli installati
-    protected List<String> moduleData; // spazio dati del modulo
 
     public SensorDecorator(Sensor sensor) {
         super(sensor.getId());
         this.wrappedSensor = sensor;
-        this.moduleData = new ArrayList<>();
 
         // ereditiamo eventuali moduli già installati
         if (sensor instanceof SensorDecorator sd) {
@@ -62,26 +61,35 @@ public abstract class SensorDecorator extends Sensor {
     // Reset completo (base + modulo)
     @Override
     public void reset() {
-        moduleData.clear();
         wrappedSensor.reset();
-    }
-
-    // Metodo utile per aggiungere dati al modulo
-    public void addModuleData(String data) {
-        moduleData.add(data);
-    }
-
-    public List<String> getModuleData() {
-        return moduleData;
     }
 
     @Override
     public void printStatistics() {
-        // 1️⃣ delega al sensore wrappato (chain Decorator)
-        wrappedSensor.printStatistics();
+        // 1️⃣ stampa statistiche del sensore base
+        Sensor base = getBaseSensor(this);
+        base.printStatistics();
 
-        // 2️⃣ stampa solo il modulo corrente
-        System.out.println("  Modulo installato: " + getModuleName());
-        System.out.println("  Dati modulo: " + moduleData);
+        // 2️⃣ raccogli tutti i moduli decoratori
+        List<String> modules = new ArrayList<>();
+        Sensor current = this;
+        while (current instanceof SensorDecorator dec) {
+            modules.add(dec.getModuleName());
+            current = dec.getWrappedSensor();
+        }
+
+        // 3️⃣ inverti per ordine base -> ultimo modulo
+        Collections.reverse(modules);
+
+        // 4️⃣ stampa una sola volta tutti i moduli
+        System.out.println("  Moduli installati: " + String.join(", ", modules));
+    }
+
+    private Sensor getBaseSensor(Sensor sensor) {
+        Sensor current = sensor;
+        while (current instanceof SensorDecorator decorator) {
+            current = decorator.getWrappedSensor();
+        }
+        return current;
     }
 }
