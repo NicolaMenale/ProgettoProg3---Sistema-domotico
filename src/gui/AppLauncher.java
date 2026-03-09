@@ -34,11 +34,11 @@ public class AppLauncher extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         // Carica il file FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("ControlPanelView.fxml"));
         Parent root = loader.load();
 
         // Passa il sistema al controller
-        MainController controller = loader.getController();
+        ControlPanelController controller = loader.getController();
         controller.setSystem(system);
 
         // Mostra la scena
