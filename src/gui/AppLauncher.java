@@ -2,23 +2,49 @@ package gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import main.HomeSystem;
+import data.FileManager;
+import model.Sensor;
+import java.util.List;
 
 public class AppLauncher extends Application {
 
-    @Override
-    public void start(Stage stage) throws Exception {
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
-        Scene scene = new Scene(loader.load(), 800, 600);
-
-        stage.setTitle("Home Monitoring System");
-        stage.setScene(scene);
-        stage.show();
-    }
+    // Riferimento statico condiviso al sistema
+    private static HomeSystem system;
 
     public static void main(String[] args) {
-        launch();
+        // 1️⃣ Creazione del sistema
+        system = new HomeSystem();
+
+        // 2️⃣ Caricamento sensori
+        List<Sensor> sensors = FileManager.loadSensors();
+        system.setSensors(sensors);
+        system.rebuildMonitoringPairs();
+
+        // 3️⃣ Caricamento statistiche
+        FileManager.loadStatistics(sensors);
+
+        // 4️⃣ Lancia la GUI
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        // Carica il file FXML
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+        Parent root = loader.load();
+
+        // Passa il sistema al controller
+        MainController controller = loader.getController();
+        controller.setSystem(system);
+
+        // Mostra la scena
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setTitle("Smart Home System");
+        stage.show();
     }
 }

@@ -279,7 +279,7 @@ public class Main {
                     System.out.println("Tutti i sensori e moduli sono stati resettati.");
                 }
 
-                case 3-> {
+                case 3 -> {
                     FileManager.clearDataFiles();
                     System.out.println("Sistema resettato.");
                 }

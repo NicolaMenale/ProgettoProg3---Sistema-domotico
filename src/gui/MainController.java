@@ -6,8 +6,11 @@ import main.HomeSystem;
 import data.*;
 
 public class MainController {
+    private HomeSystem system;
 
-    private HomeSystem system = new HomeSystem();
+    public void setSystem(HomeSystem system) {
+        this.system = system;
+    }
 
     @FXML
     private void activateMode() {
