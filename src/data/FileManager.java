@@ -17,8 +17,8 @@ import model.MonitoringSensor;
 import model.Sensor;
 
 public class FileManager {
-    private static final String SENSOR_FILE = "data/sensors.txt";
-    private static final String STAT_FILE = "data/statistics.txt";
+    private static final String SENSOR_FILE = "/Users/nicolamenale/Desktop/Università/Anno3/Programmazione 3/Progettov.2/src/data/sensors.txt";
+    private static final String STAT_FILE = "/Users/nicolamenale/Desktop/Università/Anno3/Programmazione 3/Progettov.2/src/data/statistics.txt";
 
     public static void saveSensors(List<Sensor> sensors) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(SENSOR_FILE))) {
@@ -208,7 +208,7 @@ public class FileManager {
 
         for (File file : files) {
             // salta i file .java o FileManager.java
-            if (file.isFile() && !file.getName().endsWith(".java" ) && !file.getName().endsWith(".class")) {
+            if (file.isFile() && !file.getName().endsWith(".java" )) {
                 try {
                     new FileWriter(file).close(); // svuota il file
                 } catch (IOException e) {
