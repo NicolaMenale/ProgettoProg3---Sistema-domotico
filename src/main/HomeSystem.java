@@ -160,7 +160,7 @@ public class HomeSystem {
         for (Sensor s : sensors) {
             Sensor base = getBaseSensor(s);
             String type = (base instanceof MonitoringSensor) ? "Monitoraggio" : "Intervento";
-            info.add(base.getId() + " | Tipo: " + type);
+            info.add(base.getId() + "  | Tipo: " + type);
         }
         return info;
     }
