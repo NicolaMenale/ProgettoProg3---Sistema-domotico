@@ -6,13 +6,13 @@ import java.util.List;
 
 public class MonitoringSensor extends Sensor {
 
-    private double threshold; // aggiunto
+    private int threshold; // aggiunto
     private List<Double> readings;
     private List<LocalDateTime> alarmHistory;
     private LocalDateTime lastAlarmTime;
     private int alarmCount = 0;
 
-    public MonitoringSensor(String id, double threshold) {
+    public MonitoringSensor(String id, int threshold) {
         super(id);
         this.threshold = threshold;
         this.active = false;
@@ -25,7 +25,7 @@ public class MonitoringSensor extends Sensor {
     // GETTER
     // =========================
 
-    public double getThreshold() {
+    public int getThreshold() {
         return threshold;
     }
 
@@ -93,15 +93,20 @@ public class MonitoringSensor extends Sensor {
     }
 
     @Override
-    public void printStatistics() {
-        System.out.println("- Sensore ID: " + id);
-        System.out.println("  Tipo: Monitoraggio");
-        System.out.println("  Stato: " + modeString);
-        System.out.println("  Stato attivo: " + (active ? "SI" : "NO"));
-        System.out.println("  Threshold: " + threshold);
-        System.out.println("  Letture: " + readings);
-        System.out.println("  Numero allarmi: " + alarmCount);
-        System.out.println("  Storico allarmi: " + alarmHistory);
+    public String getStatistics() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("- Sensore ID: ").append(id).append("\n");
+        sb.append("  Tipo: Monitoraggio\n");
+        sb.append("  Stato: ").append(modeString).append("\n");
+        sb.append("  Stato attivo: ").append(active ? "SI" : "NO").append("\n");
+        sb.append("  Threshold: ").append(threshold).append("\n");
+        sb.append("  Letture: ").append(readings).append("\n");
+        sb.append("  Numero allarmi: ").append(alarmCount).append("\n");
+        sb.append("  Storico allarmi: ").append(alarmHistory).append("\n");
+
+        return sb.toString();
     }
 
     // Imposta se il sensore è attivo (allarme in corso)
@@ -110,7 +115,7 @@ public class MonitoringSensor extends Sensor {
     }
 
     // Imposta il valore della soglia
-    public void setThreshold(double threshold) {
+    public void setThreshold(int threshold) {
         this.threshold = threshold;
     }
 

@@ -2,44 +2,204 @@ package gui;
 
 import javafx.fxml.*;
 import javafx.event.*;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.application.*;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import main.HomeSystem;
+import model.InterventionSensor;
+import model.MonitoringSensor;
+import model.Sensor;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import data.*;
+import decorator.SensorDecorator;
 
 public class ControlPanelController {
     private HomeSystem system;
 
     @FXML
-    private ListView<String> sensorListView;
+    private Label modeLabel;
+    @FXML
+    private TableView<Sensor> statsTableView;
+    @FXML
+    private TableColumn<Sensor, String> idColumn;
+    @FXML
+    private TableColumn<Sensor, String> typeColumn;
+    @FXML
+    private TableColumn<Sensor, String> activeColumn;
+    @FXML
+    private TableColumn<Sensor, String> thresholdColumn;
+    @FXML
+    private TableColumn<Sensor, String> moduleColumn;
+    @FXML
+    private TableColumn<Sensor, String> alarmColumn;
+    @FXML
+    private ComboBox<String> typeComboBox;
+    @FXML
+    private TextField thresholdField;
 
     public void setSystem(HomeSystem system) {
         this.system = system;
+        setupTable();
         refreshSensorList();
     }
 
     @FXML
     private void activateMode(ActionEvent event) throws Exception {
         system.setActiveMode();
+        modeLabel.setText("MODALITÀ: ATTIVATO");
+        refreshSensorList();
     }
 
     @FXML
     private void testMode(ActionEvent event) throws Exception {
         system.setCollaudoMode();
+        modeLabel.setText("MODALITÀ: COLLAUDO");
+        refreshSensorList();
     }
 
-    private void refreshSensorList() {
+    public void refreshSensorList() {
         if (system == null)
             return;
+        ObservableList<Sensor> data = FXCollections.observableArrayList(system.getSensors());
+        statsTableView.setItems(data);
+    }
 
-        // ottiene lista sensori come stringhe (es. ID)
-        ObservableList<String> sensorNames = FXCollections.observableArrayList(
-                system.getSensorInfo() // ti aspetti List<String> qui
-        );
+    private void setupTable() {
+        // Colonne base
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        sensorListView.setItems(sensorNames);
+        // Tipo (Monitoring o Intervention)
+        typeColumn.setCellValueFactory(cell -> {
+            Sensor base = getBaseSensor(cell.getValue());
+            String tipo = (base instanceof MonitoringSensor) ? "Monitoring" : "Intervention";
+            return new SimpleStringProperty(tipo);
+        });
+
+        // Attivo (YES/NO)
+        activeColumn.setCellValueFactory(cell -> {
+            Sensor base = getBaseSensor(cell.getValue());
+            String val = base.isActive() ? "YES" : "NO";
+            return new SimpleStringProperty(val);
+        });
+
+        // Threshold
+        thresholdColumn.setCellValueFactory(cell -> {
+            Sensor base = getBaseSensor(cell.getValue());
+            String val;
+            if (base instanceof MonitoringSensor ms) {
+                val = String.valueOf(ms.getThreshold());
+            } else {
+                val = "-";
+            }
+            return new SimpleStringProperty(val);
+        });
+
+        // Moduli
+        moduleColumn.setCellValueFactory(cell -> {
+            Sensor s = cell.getValue();
+            List<String> modules = new ArrayList<>();
+            Sensor current = s;
+            while (current instanceof SensorDecorator dec) {
+                modules.add(dec.getModuleName());
+                current = dec.getWrappedSensor();
+            }
+
+            // se vuoi ordine base -> ultimo modulo
+            Collections.reverse(modules);
+
+            String val = modules.isEmpty() ? "-" : String.join(", ", modules);
+            return new SimpleStringProperty(val);
+        });
+
+        // Allarmi / Attivazioni
+        alarmColumn.setCellValueFactory(cell -> {
+            Sensor base = getBaseSensor(cell.getValue());
+            String val;
+            if (base instanceof MonitoringSensor ms) {
+                val = String.valueOf(ms.getAlarmCount());
+            } else if (base instanceof InterventionSensor is) {
+                val = String.valueOf(is.getActivationCount());
+            } else {
+                val = "-";
+            }
+            return new SimpleStringProperty(val);
+        });
+    }
+
+    private Sensor getBaseSensor(Sensor s) {
+        Sensor current = s;
+        while (current instanceof SensorDecorator dec) {
+            current = dec.getWrappedSensor();
+        }
+        return current;
+    }
+
+    @FXML
+    private void openInstallPairWindow() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("InstallPairView.fxml"));
+        Parent root = loader.load();
+
+        // Prendi il controller della finestra secondaria
+        InstallPairController controller = loader.getController();
+        controller.setSystem(system); // Passa il riferimento al sistema principale
+
+        // Crea una nuova finestra
+        Stage stage = new Stage();
+        stage.setTitle("Aggiungi coppia di sensori");
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.APPLICATION_MODAL); // blocca il main panel finché la finestra è aperta
+        stage.showAndWait(); // aspetta che l’utente chiuda la finestra
+
+        // Dopo la chiusura, aggiorna la lista dei sensori nel main panel
+        refreshSensorList();
+    }
+
+    @FXML
+    private void openResetWindow() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("ResetView.fxml"));
+        Parent root = loader.load();
+
+        ResetController controller = loader.getController();
+        controller.setSystem(system);
+        controller.setMainController(this);
+
+        Stage stage = new Stage();
+        stage.setTitle("Reset Sensori");
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.APPLICATION_MODAL); // blocca main panel
+        stage.showAndWait();
+
+        // Dopo chiusura, aggiorna lista sensori
+        refreshSensorList();
+    }
+
+    @FXML
+    private void openDecorateWindow() throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("DecorateSensorView.fxml"));
+        Parent root = loader.load();
+
+        DecorateSensorController controller = loader.getController();
+
+        controller.setSystem(system);
+        controller.setMainController(this);
+
+        Stage stage = new Stage();
+        stage.setTitle("Aggiungi Moduli Sensore");
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     @FXML

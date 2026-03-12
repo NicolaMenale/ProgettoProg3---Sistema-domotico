@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import main.HomeSystem;
+import main.TestModeState;
 import data.FileManager;
 import model.Sensor;
 import java.util.List;
@@ -18,7 +19,7 @@ public class AppLauncher extends Application {
     public static void main(String[] args) {
         // 1️⃣ Creazione del sistema
         system = new HomeSystem();
-
+        system.setState(new TestModeState());
         // 2️⃣ Caricamento sensori
         List<Sensor> sensors = FileManager.loadSensors();
         system.setSensors(sensors);
@@ -46,5 +47,12 @@ public class AppLauncher extends Application {
         stage.setScene(scene);
         stage.setTitle("Smart Home System");
         stage.show();
+
+        stage.setOnCloseRequest(event -> {
+            // Salva dati prima di chiudere
+            System.out.println("Salvataggio dati prima di uscire...");
+            FileManager.saveSensors(system.getSensors());
+            FileManager.saveStatistics(system.getSensors());
+        });
     }
 }

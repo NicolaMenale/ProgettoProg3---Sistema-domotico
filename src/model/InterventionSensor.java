@@ -67,13 +67,18 @@ public class InterventionSensor extends Sensor {
     }
 
     @Override
-    public void printStatistics() {
-        System.out.println("- Sensore ID: " + id);
-        System.out.println("  Tipo: Intervento");
-        System.out.println("  Stato: " + modeString);
-        System.out.println("  Stato attivo: " + (active ? "SI" : "NO"));
-        System.out.println("  Numero attivazioni: " + activationCount);
-        System.out.println("  Storico attivazioni: " + activationHistory);
+    public String getStatistics() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("- Sensore ID: ").append(id).append("\n");
+        sb.append("  Tipo: Intervento\n");
+        sb.append("  Stato: ").append(modeString).append("\n");
+        sb.append("  Stato attivo: ").append(active ? "SI" : "NO").append("\n");
+        sb.append("  Numero attivazioni: ").append(activationCount).append("\n");
+        sb.append("  Storico attivazioni: ").append(activationHistory).append("\n");
+
+        return sb.toString();
     }
 
     // Imposta se il sensore di intervento è attivo

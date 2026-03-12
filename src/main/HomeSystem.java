@@ -47,7 +47,7 @@ public class HomeSystem {
      */
 
     // ===== Metodo pubblico: delega allo stato =====
-    public void installMonitoringPair(String monitorType, String interventionType, double threshold) {
+    public void installMonitoringPair(String monitorType, String interventionType, int threshold) {
         // Crea i sensori tramite Factory internamente
         SensorFactory monitorFactory = SensorFactoryProvider.getFactory(monitorType, threshold);
         Sensor monitorSensor = monitorFactory.createSensor(monitorType + (countSensorsByType(monitorType) + 1));
@@ -233,19 +233,35 @@ public class HomeSystem {
                 .count();
     }
 
-    public void showStatistics() {
+    public String getSensorStatistics(String sensorId) {
 
         if (sensors.isEmpty()) {
-            System.out.println("Nessun sensore installato.");
-            return;
+            return "Nessun sensore installato.";
         }
-
-        System.out.println("\n--- STATISTICHE SENSORI ---");
 
         for (Sensor s : sensors) {
-            s.printStatistics();
-            System.out.println();
+            if (s.getId().equals(sensorId)) {
+                return s.getStatistics();
+            }
         }
+
+        return "Sensore non trovato.";
+    }
+
+    public String getAllStatistics() {
+
+        if (sensors.isEmpty()) {
+            return "Nessun sensore installato.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n--- STATISTICHE SENSORI ---\n\n");
+
+        for (Sensor s : sensors) {
+            sb.append(s.getStatistics()).append("\n");
+        }
+
+        return sb.toString();
     }
 
     // ---------------------------------------------------------------------------------------------//
@@ -267,8 +283,10 @@ public class HomeSystem {
 
             if (base instanceof MonitoringSensor ms) {
                 // genera lettura casuale
-                double value = (Math.random() < 0.5) ? ms.getThreshold() + Math.random() * 5
-                        : ms.getThreshold() - Math.random() * 5;
+                int value = (int) Math.round((Math.random() < 0.5) 
+                        ? ms.getThreshold() + Math.random() * 5
+                        : ms.getThreshold() + Math.random() * 5
+                    );
 
                 boolean alarmTriggered = ms.addReading(value);
 

@@ -5,10 +5,10 @@ import model.Sensor;
 
 public class MonitoringSensorFactory extends SensorFactory {
 
-    private double threshold;
+    private int threshold;
 
     // Costruttore che accetta la soglia
-    public MonitoringSensorFactory(double threshold) {
+    public MonitoringSensorFactory(int threshold) {
         this.threshold = threshold;
     }
 
@@ -18,7 +18,7 @@ public class MonitoringSensorFactory extends SensorFactory {
 
         // Recupero del threshold da qualche modo, ad esempio un campo della factory o
         // parametro
-        double threshold = this.threshold; // se la factory mantiene un threshold passato
+        int threshold = this.threshold; // se la factory mantiene un threshold passato
 
         return switch (prefix) {
             case "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" -> new MonitoringSensor(id, threshold);

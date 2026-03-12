@@ -13,7 +13,7 @@ public class SensorFactoryProvider {
     }
 
     // Nuovo metodo per passare il threshold manuale
-    public static SensorFactory getFactory(String prefix, double threshold) {
+    public static SensorFactory getFactory(String prefix, int threshold) {
         return switch (prefix) {
             case "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" -> new MonitoringSensorFactory(threshold);
             case "AIRCONDITIONER", "POWERCUT", "SIREN", "VENT", "LOCK" -> new InterventionSensorFactory();

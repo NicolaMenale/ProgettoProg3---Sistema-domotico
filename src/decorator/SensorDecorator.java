@@ -65,24 +65,34 @@ public abstract class SensorDecorator extends Sensor {
     }
 
     @Override
-    public void printStatistics() {
-        // 1️⃣ stampa statistiche del sensore base
-        Sensor base = getBaseSensor(this);
-        base.printStatistics();
+    public String getStatistics() {
 
-        // 2️⃣ raccogli tutti i moduli decoratori
+        // 1️⃣ prendi il sensore base
+        Sensor base = getBaseSensor(this);
+
+        StringBuilder sb = new StringBuilder();
+
+        // 2️⃣ aggiungi le statistiche del sensore base
+        sb.append(base.getStatistics());
+
+        // 3️⃣ raccogli tutti i moduli decoratori
         List<String> modules = new ArrayList<>();
         Sensor current = this;
+
         while (current instanceof SensorDecorator dec) {
             modules.add(dec.getModuleName());
             current = dec.getWrappedSensor();
         }
 
-        // 3️⃣ inverti per ordine base -> ultimo modulo
+        // 4️⃣ ordine corretto (base → ultimo modulo)
         Collections.reverse(modules);
 
-        // 4️⃣ stampa una sola volta tutti i moduli
-        System.out.println("  Moduli installati: " + String.join(", ", modules));
+        // 5️⃣ aggiungi i moduli alla stringa
+        sb.append("  Moduli installati: ")
+                .append(String.join(", ", modules))
+                .append("\n");
+
+        return sb.toString();
     }
 
     private Sensor getBaseSensor(Sensor sensor) {

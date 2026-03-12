@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextField?>
+
+<VBox xmlns="http://javafx.com/javafx/21.0.0"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.ResetController"
+      spacing="15" alignment="CENTER" style="-fx-padding: 20;">
+
+    <Label text="Reset Sensori" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+    <!-- Reset singolo sensore -->
+    <HBox xmlns="http://javafx.com/javafx/21.0.0" spacing="10" alignment="CENTER_LEFT">
+        <Label text="Sensore singolo:" />
+        <ComboBox fx:id="sensorComboBox" prefWidth="250"/>
+        <Button text="Reset" onAction="#resetSingleSensor"/>
+    </HBox>
+
+    <!-- Reset tutti i sensori -->
+    <HBox xmlns="http://javafx.com/javafx/21.0.0" spacing="10" alignment="CENTER_LEFT">
+        <Label text="Reset tutti i sensori:" />
+        <Button text="Reset Tutti" onAction="#resetAllSensors"/>
+    </HBox>
+
+    <!-- Cancellazione totale -->
+    <HBox xmlns="http://javafx.com/javafx/21.0.0" spacing="10" alignment="CENTER_LEFT">
+        <Label text="Cancellazione totale dati:" />
+        <Button text="Cancella Tutto" onAction="#clearSystem"/>
+    </HBox>
+
+    <Button text="Chiudi" onAction="#closeWindow"/>
+</VBox>

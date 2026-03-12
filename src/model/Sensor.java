@@ -17,5 +17,5 @@ public abstract class Sensor {
     public void activate() { active = true; }
     public void deactivate() { active = false; }
     public abstract void reset();
-    public abstract void printStatistics();
+    public abstract String getStatistics();
 }

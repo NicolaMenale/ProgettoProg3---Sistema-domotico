@@ -79,7 +79,7 @@ public class FileManager {
                 String type = parts[1];
                 Sensor sensor;
                 if ("MONITORING".equals(type)) {
-                    double threshold = Double.parseDouble(parts[2]);
+                    int threshold = (int) Math.round(Double.parseDouble(parts[2]));
                     sensor = new MonitoringSensor(id, threshold);
                     // decorator partono da indice 3
                     for (int i = 3; i < parts.length; i++) {
@@ -162,7 +162,7 @@ public class FileManager {
 
                 if (s instanceof MonitoringSensor ms && "MONITORING".equals(parts[1])) {
                     ms.setActive(parts[2].equals("SI"));
-                    ms.setThreshold(Double.parseDouble(parts[3]));
+                    ms.setThreshold((int) Math.round(Double.parseDouble(parts[3])));
                     ms.setAlarmCount(Integer.parseInt(parts[5]));
 
                     // Letture

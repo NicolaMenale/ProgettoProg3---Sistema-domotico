@@ -101,7 +101,7 @@ public class Main {
                 case 2 -> system.showSensors();
                 case 3 -> resetSensorsMenu(system);
                 case 4 -> decorateSensor(system);
-                case 5 -> system.showStatistics();
+                case 5 -> System.out.println(system.getAllStatistics());
                 case 0 -> back = true;
                 default -> System.out.println("Scelta non valida.");
             }
@@ -147,7 +147,7 @@ public class Main {
 
                     // --- Inserimento threshold ---
                     System.out.print("Inserisci valore soglia (threshold) per il sensore " + monitorType + ": ");
-                    double threshold = scanner.nextDouble();
+                    int threshold = scanner.nextInt();
 
                     try {
                         system.installMonitoringPair(monitorType, interventionType, threshold);
@@ -312,7 +312,7 @@ public class Main {
             switch (choice) {
                 case 1 -> system.simulateSensorCycle(); // HomeSystem gestisce internamente le letture e gli allarmi
                 case 2 -> system.showSensors(); // HomeSystem gestisce la stampa dei sensori
-                case 3 -> system.showStatistics();
+                case 3 -> System.out.println(system.getAllStatistics());
                 case 0 -> back = true;
                 default -> System.out.println("Scelta non valida.");
             }
