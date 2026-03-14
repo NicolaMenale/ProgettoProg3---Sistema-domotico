@@ -1,9 +1,7 @@
 package decorator;
 
 import model.Sensor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class SensorDecorator extends Sensor {
 

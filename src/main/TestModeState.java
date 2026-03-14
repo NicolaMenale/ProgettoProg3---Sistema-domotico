@@ -1,13 +1,15 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import decorator.SensorDecorator;
-import model.MonitoringSensor;
-import model.Sensor;
+import model.*;
 
 public class TestModeState extends SystemState {
+    @Override
+    public boolean isActivated() {
+        return false;
+    }
 
     @Override
     public void installSensor(HomeSystem system, Sensor sensor) {
@@ -58,11 +60,11 @@ public class TestModeState extends SystemState {
 
     @Override
     public void handleAlarm(HomeSystem system, Sensor monitor) {
-        System.out.println("Sistema in collaudo: allarme ignorato.");
+        //
     }
 
     @Override
     public void handleStopAlarm(HomeSystem system, Sensor monitor) {
-        // niente
+        // 
     }
 }

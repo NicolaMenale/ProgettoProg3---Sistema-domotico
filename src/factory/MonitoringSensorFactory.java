@@ -1,7 +1,6 @@
 package factory;
 
-import model.MonitoringSensor;
-import model.Sensor;
+import model.*;
 
 public class MonitoringSensorFactory extends SensorFactory {
 

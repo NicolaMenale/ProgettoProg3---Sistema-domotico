@@ -3,6 +3,10 @@ package main;
 import model.Sensor;
 
 public class ActiveModeState extends SystemState {
+    @Override
+    public boolean isActivated() {
+        return true;
+    }
 
     @Override
     public void installSensor(HomeSystem system, Sensor sensor) {

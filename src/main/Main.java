@@ -8,7 +8,7 @@ public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);
 
-    static void main() {
+    public static void main(String[] args) {
 
         // ===== Creazione sistema =====
         HomeSystem system = new HomeSystem();
@@ -30,7 +30,7 @@ public class Main {
         boolean exit = false;
 
         while (!exit) {
-            System.out.println("\n=== SMART HOME SYSTEM ===");
+            System.out.println("\n=== Sistema Domotico ===");
             System.out.println("1. Modalità Collaudo");
             System.out.println("2. Modalità Attivato");
             System.out.println("0. Esci");
@@ -60,26 +60,6 @@ public class Main {
 
         system.setState(new TestModeState());
 
-        // Thread per statistiche periodiche
-        /*
-         * Thread statsThread = new Thread(() -> {
-         * while (!Thread.currentThread().isInterrupted()) {
-         * try {
-         * Thread.sleep(5000); // ogni 5 secondi
-         * } catch (InterruptedException e) {
-         * break; // uscita dal thread se interrotto
-         * }
-         * 
-         * List<Sensor> sensors = system.getSensors();
-         * if (!sensors.isEmpty()) {
-         * System.out.println("\n--- STATISTICHE PERIODICHE SENSORI ---");
-         * system.showStatistics();
-         * }
-         * }
-         * });
-         * statsThread.setDaemon(true); // non blocca l'uscita
-         * statsThread.start();
-         */
         system.setCollaudoMode();
         boolean back = false;
         system.clearAlarmQueues();
@@ -101,7 +81,7 @@ public class Main {
                 case 2 -> system.showSensors();
                 case 3 -> resetSensorsMenu(system);
                 case 4 -> decorateSensor(system);
-                case 5 -> System.out.println(system.getAllStatistics());
+                case 5 -> system.getAllStatistics();
                 case 0 -> back = true;
                 default -> System.out.println("Scelta non valida.");
             }
@@ -156,6 +136,72 @@ public class Main {
                     }
                 }
                 case 0 -> back = true;
+                default -> System.out.println("Scelta non valida.");
+            }
+        }
+    }
+
+    // ==========================
+    // MENU RESET SENSORI
+    // ==========================
+    private static void resetSensorsMenu(HomeSystem system) {
+        
+        boolean back = false;
+
+        while (!back) {
+            System.out.println("\n--- RESET SENSORI ---");
+            System.out.println("1. Reset singolo sensore");
+            System.out.println("2. Reset tutti i sensori");
+            System.out.println("3. Cancellazione Totale");
+            System.out.println("0. Torna indietro");
+            System.out.print("Scelta: ");
+
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1 -> {
+                    // Ottieni lista dei sensori come info testuali
+                    List<String> sensorInfo = system.getSensorInfo();
+                    if (sensorInfo.isEmpty()) {
+                        System.out.println("Nessun sensore installato.");
+                        continue;
+                    }
+
+                    System.out.println("\nSeleziona sensore da resettare:");
+                    for (int i = 0; i < sensorInfo.size(); i++) {
+                        System.out.println((i + 1) + ". " + sensorInfo.get(i));
+                    }
+                    System.out.println("0. Annulla");
+                    System.out.print("Scelta: ");
+
+                    int sensorChoice = scanner.nextInt();
+                    if (sensorChoice == 0)
+                        break;
+                    if (sensorChoice < 1 || sensorChoice > sensorInfo.size()) {
+                        System.out.println("Scelta non valida.");
+                        continue;
+                    }
+
+                    String sensorId = system.getSensorIdByIndex(sensorChoice - 1);
+                    if (system.resetSensorById(sensorId)) {
+                        System.out.println("Sensore " + sensorId + " resettato (base + moduli).");
+                    } else {
+                        System.out.println("Errore nel resettare il sensore " + sensorId);
+                    }
+                }
+
+                case 2 -> {
+                    system.resetSensors(); // HomeSystem gestisce tutto internamente
+                    System.out.println("Tutti i sensori e moduli sono stati resettati.");
+                }
+
+                case 3 -> {
+                    FileManager.clearDataFiles();
+                    System.out.println("Sistema resettato.");
+                }
+
+                case 0 -> back = true;
+
                 default -> System.out.println("Scelta non valida.");
             }
         }
@@ -226,70 +272,7 @@ public class Main {
         }
     }
 
-    // ==========================
-    // MENU RESET SENSORI
-    // ==========================
-    private static void resetSensorsMenu(HomeSystem system) {
-        boolean back = false;
-
-        while (!back) {
-            System.out.println("\n--- RESET SENSORI ---");
-            System.out.println("1. Reset singolo sensore");
-            System.out.println("2. Reset tutti i sensori");
-            System.out.println("3. Cancellazione Totale");
-            System.out.println("0. Torna indietro");
-            System.out.print("Scelta: ");
-
-            int choice = scanner.nextInt();
-
-            switch (choice) {
-                case 1 -> {
-                    // Ottieni lista dei sensori come info testuali
-                    List<String> sensorInfo = system.getSensorInfo();
-                    if (sensorInfo.isEmpty()) {
-                        System.out.println("Nessun sensore installato.");
-                        continue;
-                    }
-
-                    System.out.println("\nSeleziona sensore da resettare:");
-                    for (int i = 0; i < sensorInfo.size(); i++) {
-                        System.out.println((i + 1) + ". " + sensorInfo.get(i));
-                    }
-                    System.out.println("0. Annulla");
-                    System.out.print("Scelta: ");
-
-                    int sensorChoice = scanner.nextInt();
-                    if (sensorChoice == 0)
-                        break;
-                    if (sensorChoice < 1 || sensorChoice > sensorInfo.size()) {
-                        System.out.println("Scelta non valida.");
-                        continue;
-                    }
-
-                    String sensorId = system.getSensorIdByIndex(sensorChoice - 1);
-                    if (system.resetSensorById(sensorId)) {
-                        System.out.println("Sensore " + sensorId + " resettato (base + moduli).");
-                    } else {
-                        System.out.println("Errore nel resettare il sensore " + sensorId);
-                    }
-                }
-
-                case 2 -> {
-                    system.resetSensors(); // HomeSystem gestisce tutto internamente
-                    System.out.println("Tutti i sensori e moduli sono stati resettati.");
-                }
-
-                case 3 -> {
-                    FileManager.clearDataFiles();
-                    System.out.println("Sistema resettato.");
-                }
-
-                case 0 -> back = true;
-
-                default -> System.out.println("Scelta non valida.");
-            }
-        }
-    }
+    
 
     // =========================
     // MODALITÀ ATTIVATO
@@ -312,7 +295,7 @@ public class Main {
             switch (choice) {
                 case 1 -> system.simulateSensorCycle(); // HomeSystem gestisce internamente le letture e gli allarmi
                 case 2 -> system.showSensors(); // HomeSystem gestisce la stampa dei sensori
-                case 3 -> System.out.println(system.getAllStatistics());
+                case 3 -> system.getAllStatistics();
                 case 0 -> back = true;
                 default -> System.out.println("Scelta non valida.");
             }

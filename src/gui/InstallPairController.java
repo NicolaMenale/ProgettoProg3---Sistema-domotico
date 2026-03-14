@@ -1,21 +1,26 @@
 package gui;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import main.HomeSystem;
 
 public class InstallPairController {
-
+    @FXML
+    private TextArea logArea;
     @FXML
     private ComboBox<String> typeComboBox;
     @FXML
     private TextField thresholdField;
+    private ControlPanelController mainController;
     private HomeSystem system;
     private final String[] monitorTypes = { "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" };
     private final String[] interventionTypes = { "AIRCONDITIONER", "POWERCUT", "SIREN", "VENT", "LOCK" };
+
+    public void setMainController(ControlPanelController controller) {
+        this.mainController = controller;
+    }
 
     public void setSystem(HomeSystem system) {
         this.system = system;
@@ -45,10 +50,10 @@ public class InstallPairController {
             Stage stage = (Stage) thresholdField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            System.out.println("Threshold non valido!");
+            mainController.addLog("Inserire un Numero");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
 }

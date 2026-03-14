@@ -3,6 +3,7 @@ package main;
 import model.Sensor;
 
 public abstract class SystemState {
+    public abstract boolean isActivated();
 
     // Installa un sensore nel sistema
     public abstract void installSensor(HomeSystem system, Sensor sensor);

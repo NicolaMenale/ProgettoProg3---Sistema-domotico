@@ -45,7 +45,7 @@ public class AppLauncher extends Application {
         // Mostra la scena
         Scene scene = new Scene(root);
         stage.setScene(scene);
-        stage.setTitle("Smart Home System");
+        stage.setTitle("Sistema Domotico");
         stage.show();
 
         stage.setOnCloseRequest(event -> {

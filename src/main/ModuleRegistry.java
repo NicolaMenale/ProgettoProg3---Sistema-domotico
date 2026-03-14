@@ -127,10 +127,6 @@ public class ModuleRegistry {
         });
     }
 
-    // ==============================
-    // METODI PUBBLICI
-    // ==============================
-
     /**
      * Restituisce i moduli disponibili per un sensore,
      * escludendo quelli già installati.
@@ -153,10 +149,6 @@ public class ModuleRegistry {
             return null;
         return creator.apply(sensor);
     }
-
-    // ==============================
-    // METODI INTERNI
-    // ==============================
 
     // Ottiene il sensore base senza decoratori
     private static Sensor getBaseSensor(Sensor sensor) {

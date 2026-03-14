@@ -1,25 +1,16 @@
 package main;
 
 import model.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 import data.*;
 import decorator.SensorDecorator;
-import factory.SensorFactory;
-import factory.SensorFactoryProvider;
+import factory.*;
 
 public class HomeSystem {
-    // relazione 1:1 monitoraggio → intervento
     private Map<Sensor, Sensor> monitoringToIntervention = new HashMap<>();
     private List<Sensor> sensors = new ArrayList<>();
     private SystemState currentState;
-    // code FIFO
+
     private Queue<Sensor> alarmQueue = new PriorityQueue<>(
             Comparator.comparing(
                     s -> ((MonitoringSensor) s).getLastAlarmTime(),
@@ -29,6 +20,8 @@ public class HomeSystem {
             Comparator.comparing(
                     s -> ((MonitoringSensor) s).getLastAlarmTime(),
                     Comparator.nullsLast(Comparator.naturalOrder())));
+                    
+    List<Sensor> currentAlarms;
 
     // ===== Costruttore =====
     public HomeSystem() {
@@ -40,13 +33,26 @@ public class HomeSystem {
         this.currentState = state;
     }
 
-    /*
-     * public SystemState getState() {
-     * return currentState;
-     * }
-     */
+    public boolean isActivated() {
+        return currentState.isActivated();
+    }
 
-    // ===== Metodo pubblico: delega allo stato =====
+    // =========================
+    // MODALITÀ COLLAUDO
+    // =========================
+
+    public void setCollaudoMode() {
+        System.out.println("Modalità Collaudo: tutti i sensori disattivati.");
+        for (Sensor s : sensors) {
+            s.setModeString("OFFLINE");
+            s.deactivate();
+        }
+        clearAlarmQueues();
+    }
+
+    // =========================
+    // INSTALLAZIONE SENSORI
+    // =========================
     public void installMonitoringPair(String monitorType, String interventionType, int threshold) {
         // Crea i sensori tramite Factory internamente
         SensorFactory monitorFactory = SensorFactoryProvider.getFactory(monitorType, threshold);
@@ -66,6 +72,13 @@ public class HomeSystem {
         System.out.println("Coppia installata: " + monitorSensor.getId() + " ↔ " + interventionSensor.getId());
     }
 
+    public void installSensor(Sensor sensor) {
+        if (currentState == null) {
+            throw new IllegalStateException("Stato del sistema non impostato!");
+        }
+        currentState.installSensor(this, sensor);
+    }
+
     public void addMonitoringPair(Sensor monitor, Sensor intervention) {
         if (monitoringToIntervention.containsKey(monitor)) {
             throw new IllegalArgumentException("Monitoraggio già associato.");
@@ -77,32 +90,21 @@ public class HomeSystem {
         monitoringToIntervention.put(monitor, intervention);
     }
 
-    public void installSensor(Sensor sensor) {
-        if (currentState == null) {
-            throw new IllegalStateException("Stato del sistema non impostato!");
-        }
-        currentState.installSensor(this, sensor);
+    // ===== Conteggio sensori di un certo tipo =====
+    public long countSensorsByType(String prefix) {
+        return sensors.stream()
+                .filter(s -> s.getId().startsWith(prefix))
+                .count();
     }
 
-    public boolean resetSensorById(String id) {
-        for (int i = 0; i < sensors.size(); i++) {
-            Sensor s = getBaseSensor(sensors.get(i));
-            if (s.getId().equals(id)) {
-                sensors.get(i).reset(); // chiama reset anche su eventuali decorator
-                return true;
-            }
-        }
-        return false;
+    public void addSensorInternal(Sensor sensor) {
+        sensors.add(sensor);
     }
 
-    public void resetSensors() {
-        if (currentState == null) {
-            throw new IllegalStateException("Stato del sistema non impostato!");
-        }
-        currentState.resetSensors(this);
-    }
+    // =========================
+    // MOSTRA SENSORI INSTALLATI
+    // =========================
 
-    // ===== Metodi interni usati dagli stati =====
     public void showSensors() {
         if (sensors.isEmpty()) {
             System.out.println("Nessun sensore installato.");
@@ -153,44 +155,31 @@ public class HomeSystem {
         }
     }
 
-    // Restituisce una lista di stringhe con info di ogni sensore già “base”
-    // Esempio: "TEMPERATURE1 | Tipo: Monitoraggio"
-    public List<String> getSensorInfo() {
-        List<String> info = new ArrayList<>();
-        for (Sensor s : sensors) {
-            Sensor base = getBaseSensor(s);
-            String type = (base instanceof MonitoringSensor) ? "Monitoraggio" : "Intervento";
-            info.add(base.getId() + "  | Tipo: " + type);
+    // =========================
+    // RESET SENSORI
+    // =========================
+
+    public boolean resetSensorById(String id) {
+        for (int i = 0; i < sensors.size(); i++) {
+            Sensor s = getBaseSensor(sensors.get(i));
+            if (s.getId().equals(id)) {
+                sensors.get(i).reset(); // chiama reset anche su eventuali decorator
+                return true;
+            }
         }
-        return info;
+        return false;
     }
 
-    public String getSensorIdByIndex(int index) {
-        if (index < 0 || index >= sensors.size())
-            return null;
-        return getBaseSensor(sensors.get(index)).getId();
-    }
-
-    public Sensor getBaseSensor(Sensor sensor) {
-        Sensor base = sensor;
-        while (base instanceof SensorDecorator decorator) {
-            base = decorator.getWrappedSensor();
+    public void resetSensors() {
+        if (currentState == null) {
+            throw new IllegalStateException("Stato del sistema non impostato!");
         }
-        return base;
+        currentState.resetSensors(this);
     }
 
-    public List<String> getAvailableModules(String sensorId) {
-        Sensor sensor = sensors.stream()
-                .filter(s -> getBaseSensor(s).getId().equals(sensorId))
-                .findFirst()
-                .orElse(null);
-
-        if (sensor == null)
-            return new ArrayList<>();
-
-        // supponiamo che HomeSystem tenga internamente un ModuleRegistry
-        return ModuleRegistry.getAvailableModules(sensor);
-    }
+    // =========================
+    // AGGIUNTA MODULI A SENSORI
+    // =========================
 
     public boolean addModuleToSensor(String sensorId, String moduleName) {
         int index = -1;
@@ -218,40 +207,14 @@ public class HomeSystem {
         return false;
     }
 
-    public void addSensorInternal(Sensor sensor) {
-        sensors.add(sensor);
-    }
+    // =========================
+    // MOSTRA STATISTICHE SENSORI
+    // =========================
 
-    public List<Sensor> getSensors() {
-        return sensors;
-    }
-
-    // ===== Conteggio sensori di un certo tipo =====
-    public long countSensorsByType(String prefix) {
-        return sensors.stream()
-                .filter(s -> s.getId().startsWith(prefix))
-                .count();
-    }
-
-    public String getSensorStatistics(String sensorId) {
+    public void getAllStatistics() {
 
         if (sensors.isEmpty()) {
-            return "Nessun sensore installato.";
-        }
-
-        for (Sensor s : sensors) {
-            if (s.getId().equals(sensorId)) {
-                return s.getStatistics();
-            }
-        }
-
-        return "Sensore non trovato.";
-    }
-
-    public String getAllStatistics() {
-
-        if (sensors.isEmpty()) {
-            return "Nessun sensore installato.";
+            System.out.println("Nessun sensore installato.");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -261,61 +224,97 @@ public class HomeSystem {
             sb.append(s.getStatistics()).append("\n");
         }
 
-        return sb.toString();
+        System.out.println(sb.toString());
     }
 
-    // ---------------------------------------------------------------------------------------------//
-    // Attiva tutti i sensori
+    // =========================
+    // MODALITÀ ATTIVATO
+    // =========================
 
-    public void simulateSensorCycle() {
-        if (sensors.isEmpty()) {
-            System.out.println("Nessun sensore installato.");
-            return;
+    public void setActiveMode() {
+        System.out.println("Modalità Attivato: tutti i sensori di monitoraggio attivi.");
+
+        for (Sensor monitor : monitoringToIntervention.keySet()) {
+
+            Sensor intervention = monitoringToIntervention.get(monitor);
+
+            Sensor baseMonitor = getBaseSensor(monitor);
+            Sensor baseIntervention = getBaseSensor(intervention);
+
+            monitor.setModeString("ONLINE");
+            intervention.setModeString("ONLINE");
+
+            if (baseMonitor instanceof MonitoringSensor ms &&
+                    baseIntervention instanceof InterventionSensor is) {
+
+                // se esiste almeno un allarme → la coppia è attiva
+                boolean active = !ms.getAlarmHistory().isEmpty();
+
+                ms.setActive(active);
+                is.setActive(active);
+            }
+        }
+        clearAlarmQueues();
+    }
+
+    // =========================
+    // SIMULAZIONE MONITORAGGIO/INTERVENTI
+    // ========================
+
+    public List<String> simulateSensorCycle() {
+        List<String> logs = new ArrayList<>();
+
+        if (!currentState.isActivated()) {
+            logs.add("Modalità Collaudo. Simulazione non permessa.");
+            return logs;
         }
 
-        System.out.println("\nSimulazione letture sensori in corso...");
-        // 1️⃣ Mescola l'ordine dei sensori per simulazione realistica
         List<Sensor> shuffled = new ArrayList<>(sensors);
         Collections.shuffle(shuffled);
 
         for (Sensor s : shuffled) {
+
             Sensor base = getBaseSensor(s);
 
             if (base instanceof MonitoringSensor ms) {
-                // genera lettura casuale
-                int value = (int) Math.round((Math.random() < 0.5) 
+
+                int value = (int) Math.round((Math.random() < 0.5)
                         ? ms.getThreshold() + Math.random() * 5
-                        : ms.getThreshold() + Math.random() * 5
-                    );
+                        : ms.getThreshold() - Math.random() * 5);
 
                 boolean alarmTriggered = ms.addReading(value);
 
+                logs.add("Sensore " + ms.getId() + " lettura: " + value);
+
                 if (alarmTriggered) {
+
                     enqueueAlarm(ms);
+                    logs.add("⚠ ALLARME ATTIVATO su sensore " + ms.getId());
+
                 } else if (!alarmTriggered && !ms.isActive()) {
+
                     enqueueStopAlarm(ms);
+                    logs.add("✔ ALLARME DISATTIVATO su sensore " + ms.getId());
                 }
             }
         }
+        for (String log : logs) {
+            System.out.println(log);
+        }
+
+        currentAlarms = new ArrayList<>(alarmQueue);
 
         processAlarms();
         processStopAlarms();
+
         FileManager.saveSensors(sensors);
         FileManager.saveStatistics(sensors);
+
+        return logs;
     }
 
-    public void notifyAlarm(Sensor monitor) {
-        if (currentState == null) {
-            throw new IllegalStateException("Stato del sistema non impostato!");
-        }
-        currentState.handleAlarm(this, monitor);
-    }
-
-    public void notifyStopAlarm(Sensor monitor) {
-        if (currentState == null) {
-            throw new IllegalStateException("Stato del sistema non impostato!");
-        }
-        currentState.handleStopAlarm(this, monitor);
+    public List<Sensor> getAlarmQueue() {
+        return new ArrayList<>(currentAlarms);
     }
 
     public void enqueueAlarm(Sensor monitor) {
@@ -360,20 +359,6 @@ public class HomeSystem {
         }
     }
 
-    public void triggerAlarm(String monitorId) {
-        Sensor monitor = sensors.stream()
-                .filter(s -> s.getId().equals(monitorId))
-                .findFirst()
-                .orElse(null);
-
-        if (monitor == null) {
-            System.out.println("Sensore non trovato.");
-            return;
-        }
-
-        currentState.handleAlarm(this, monitor);
-    }
-
     public void stopAlarm(String monitorId) {
         Sensor monitor = sensors.stream()
                 .filter(s -> s.getId().equals(monitorId))
@@ -394,43 +379,9 @@ public class HomeSystem {
         System.out.println("Code di allarme resettate.");
     }
 
-    public void setCollaudoMode() {
-        System.out.println("Modalità Collaudo: tutti i sensori disattivati.");
-        for (Sensor s : sensors) {
-            s.setModeString("OFFLINE");
-            s.deactivate();
-        }
-        alarmQueue.clear();
-        stopAlarmQueue.clear();
-    }
-
-    public void setActiveMode() {
-        System.out.println("Modalità Attivato: tutti i sensori di monitoraggio attivi.");
-
-        for (Sensor monitor : monitoringToIntervention.keySet()) {
-
-            Sensor intervention = monitoringToIntervention.get(monitor);
-
-            Sensor baseMonitor = getBaseSensor(monitor);
-            Sensor baseIntervention = getBaseSensor(intervention);
-
-            monitor.setModeString("ONLINE");
-            intervention.setModeString("ONLINE");
-
-            if (baseMonitor instanceof MonitoringSensor ms &&
-                    baseIntervention instanceof InterventionSensor is) {
-
-                // se esiste almeno un allarme → la coppia è attiva
-                boolean active = !ms.getAlarmHistory().isEmpty();
-
-                ms.setActive(active);
-                is.setActive(active);
-            }
-        }
-
-        alarmQueue.clear();
-        stopAlarmQueue.clear();
-    }
+    // =========================
+    // METODI HELPER
+    // ========================
 
     public void setSensors(List<Sensor> sensors) {
         this.sensors = sensors;
@@ -451,5 +402,46 @@ public class HomeSystem {
         for (int i = 0; i < Math.min(monitoringSensors.size(), interventionSensors.size()); i++) {
             addMonitoringPair(monitoringSensors.get(i), interventionSensors.get(i));
         }
+    }
+
+    public List<String> getSensorInfo() {
+        List<String> info = new ArrayList<>();
+        for (Sensor s : sensors) {
+            Sensor base = getBaseSensor(s);
+            String type = (base instanceof MonitoringSensor) ? "Monitoraggio" : "Intervento";
+            info.add(base.getId() + "  | Tipo: " + type);
+        }
+        return info;
+    }
+
+    public Sensor getBaseSensor(Sensor sensor) {
+        Sensor base = sensor;
+        while (base instanceof SensorDecorator decorator) {
+            base = decorator.getWrappedSensor();
+        }
+        return base;
+    }
+
+    public String getSensorIdByIndex(int index) {
+        if (index < 0 || index >= sensors.size())
+            return null;
+        return getBaseSensor(sensors.get(index)).getId();
+    }
+
+    public List<String> getAvailableModules(String sensorId) {
+        Sensor sensor = sensors.stream()
+                .filter(s -> getBaseSensor(s).getId().equals(sensorId))
+                .findFirst()
+                .orElse(null);
+
+        if (sensor == null)
+            return new ArrayList<>();
+
+        // supponiamo che HomeSystem tenga internamente un ModuleRegistry
+        return ModuleRegistry.getAvailableModules(sensor);
+    }
+
+    public List<Sensor> getSensors() {
+        return sensors;
     }
 }

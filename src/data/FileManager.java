@@ -1,20 +1,11 @@
 package data;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import decorator.*;
-import model.InterventionSensor;
-import model.MonitoringSensor;
-import model.Sensor;
+import model.*;
 
 public class FileManager {
     private static final String SENSOR_FILE = "/Users/nicolamenale/Desktop/Università/Anno3/Programmazione 3/Progettov.2/src/data/sensors.txt";
