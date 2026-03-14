@@ -8,8 +8,8 @@ import decorator.*;
 import model.*;
 
 public class FileManager {
-    private static final String SENSOR_FILE = "/Users/nicolamenale/Desktop/Università/Anno3/Programmazione 3/Progettov.2/src/data/sensors.txt";
-    private static final String STAT_FILE = "/Users/nicolamenale/Desktop/Università/Anno3/Programmazione 3/Progettov.2/src/data/statistics.txt";
+    private static final String SENSOR_FILE = "src/data/sensors.txt";
+    private static final String STAT_FILE = "src/data/statistics.txt";
 
     public static void saveSensors(List<Sensor> sensors) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(SENSOR_FILE))) {
