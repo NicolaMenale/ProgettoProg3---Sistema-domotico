@@ -62,7 +62,6 @@ public class Main {
 
         system.setCollaudoMode();
         boolean back = false;
-        system.clearAlarmQueues();
         while (!back) {
 
             System.out.println("\n--- MODALITÀ COLLAUDO ---");

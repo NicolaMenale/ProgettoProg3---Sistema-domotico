@@ -84,7 +84,8 @@ public class MonitoringSensor extends Sensor {
     // LOGICA DI MONITORAGGIO
     // =============================
 
-    // Aggiunge una nuova lettura al sensore e verifica se scatta o termina un allarme
+    // Aggiunge una nuova lettura al sensore e verifica se scatta o termina un
+    // allarme
     public boolean addReading(double value) {
 
         // salva la lettura
@@ -170,5 +171,10 @@ public class MonitoringSensor extends Sensor {
     // Imposta il numero di allarmi già scattati
     public void setAlarmCount(int alarmCount) {
         this.alarmCount = alarmCount;
+    }
+
+    // Imposta la data dell'ultimo allarme scattato
+    public void setLastAlarmTime(LocalDateTime lastAlarmTime) {
+        this.lastAlarmTime = lastAlarmTime;
     }
 }

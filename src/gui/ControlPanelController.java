@@ -255,15 +255,15 @@ public class ControlPanelController {
     public void alarmQueue() {
         alarmQueueArea.clear();
 
-        for (Sensor s : system.getAlarmQueue()) {
+        // Scorri tutti i sensori del sistema
+        for (Sensor s : system.getSensors()) {
             Sensor base = getBaseSensor(s); // gestisce eventuali decorator
-            String line = base.getId();
 
-            if (s instanceof MonitoringSensor ms) {
-                line += " - Ultimo allarme: " + ms.getLastAlarmTime();
+            // Considera solo i sensori di monitoraggio
+            if (base instanceof MonitoringSensor ms && ms.isActive()) {
+                String line = ms.getId() + " - Ultimo allarme: " + ms.getLastAlarmTime();
+                alarmQueueArea.appendText(line + "\n");
             }
-
-            alarmQueueArea.appendText(line + "\n");
         }
     }
 

@@ -1,6 +1,9 @@
 package main;
 
 import model.*;
+
+import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 import java.util.*;
 import data.*;
 import decorator.SensorDecorator;
@@ -10,17 +13,8 @@ public class HomeSystem {
     private Map<Sensor, Sensor> monitoringToIntervention = new HashMap<>();
     private List<Sensor> sensors = new ArrayList<>();
     private SystemState currentState;
-
-    private Queue<Sensor> alarmQueue = new PriorityQueue<>(
-            Comparator.comparing(
-                    s -> ((MonitoringSensor) s).getLastAlarmTime(),
-                    Comparator.nullsLast(Comparator.naturalOrder())));
-
-    private Queue<Sensor> stopAlarmQueue = new PriorityQueue<>(
-            Comparator.comparing(
-                    s -> ((MonitoringSensor) s).getLastAlarmTime(),
-                    Comparator.nullsLast(Comparator.naturalOrder())));
-                    
+    private Queue<Sensor> alarmQueue = new LinkedList<>();
+    private Queue<Sensor> stopAlarmQueue = new LinkedList<>();
     List<Sensor> currentAlarms;
 
     // ===== Costruttore =====
@@ -47,7 +41,6 @@ public class HomeSystem {
             s.setModeString("OFFLINE");
             s.deactivate();
         }
-        clearAlarmQueues();
     }
 
     // =========================
@@ -233,9 +226,7 @@ public class HomeSystem {
 
     public void setActiveMode() {
         System.out.println("Modalità Attivato: tutti i sensori di monitoraggio attivi.");
-
         for (Sensor monitor : monitoringToIntervention.keySet()) {
-
             Sensor intervention = monitoringToIntervention.get(monitor);
 
             Sensor baseMonitor = getBaseSensor(monitor);
@@ -244,17 +235,27 @@ public class HomeSystem {
             monitor.setModeString("ONLINE");
             intervention.setModeString("ONLINE");
 
-            if (baseMonitor instanceof MonitoringSensor ms &&
-                    baseIntervention instanceof InterventionSensor is) {
-
-                // se esiste almeno un allarme → la coppia è attiva
-                boolean active = !ms.getAlarmHistory().isEmpty();
+            if (baseMonitor instanceof MonitoringSensor ms && baseIntervention instanceof InterventionSensor is) {
+                boolean active = false;
+                if (!ms.getReadings().isEmpty()) {
+                    double lastReading = ms.getReadings().get(ms.getReadings().size() - 1);
+                    active = lastReading > ms.getThreshold();
+                }
 
                 ms.setActive(active);
                 is.setActive(active);
+
+                if (active) {
+                    enqueueAlarm(ms);
+                    // imposta lastAlarmTime al valore più recente nello storico
+                    if (!ms.getAlarmHistory().isEmpty()) {
+                        ms.setLastAlarmTime(ms.getAlarmHistory().get(ms.getAlarmHistory().size() - 1));
+                    } else {
+                        ms.setLastAlarmTime(LocalDateTime.now());
+                    }
+                }
             }
         }
-        clearAlarmQueues();
     }
 
     // =========================
@@ -273,29 +274,22 @@ public class HomeSystem {
         Collections.shuffle(shuffled);
 
         for (Sensor s : shuffled) {
-
             Sensor base = getBaseSensor(s);
-
             if (base instanceof MonitoringSensor ms) {
-
                 int value = (int) Math.round((Math.random() < 0.5)
                         ? ms.getThreshold() + Math.random() * 5
                         : ms.getThreshold() - Math.random() * 5);
 
-                boolean alarmTriggered = ms.addReading(value);
-
-                logs.add("Sensore " + ms.getId() + " lettura: " + value);
-
-                if (alarmTriggered) {
-
+                boolean wasActive = ms.isActive();
+                ms.addReading(value); // aggiorna lo stato del sensore
+                if (!wasActive && ms.isActive()) {
                     enqueueAlarm(ms);
                     logs.add("⚠ ALLARME ATTIVATO su sensore " + ms.getId());
-
-                } else if (!alarmTriggered && !ms.isActive()) {
-
+                } else if (wasActive && !ms.isActive()) {
                     enqueueStopAlarm(ms);
                     logs.add("✔ ALLARME DISATTIVATO su sensore " + ms.getId());
                 }
+                // logs.add("Sensore " + ms.getId() + " lettura: " + value);
             }
         }
         for (String log : logs) {
@@ -309,7 +303,8 @@ public class HomeSystem {
 
         FileManager.saveSensors(sensors);
         FileManager.saveStatistics(sensors);
-
+        logs.add("------------------------------------------");
+        System.out.println("------------------------------------------");
         return logs;
     }
 
@@ -318,7 +313,7 @@ public class HomeSystem {
     }
 
     public void enqueueAlarm(Sensor monitor) {
-        if (!alarmQueue.contains(monitor)) {
+        if (!alarmQueue.contains(monitor) && !stopAlarmQueue.contains(monitor)) {
             alarmQueue.add(monitor);
         }
     }
@@ -329,47 +324,83 @@ public class HomeSystem {
         }
     }
 
+    // Processa gli allarmi attivi in ordine FIFO temporale
     public void processAlarms() {
-        while (!alarmQueue.isEmpty()) {
-            Sensor monitor = alarmQueue.poll();
-            Sensor base = getBaseSensor(monitor); // IMPORTANTE per decorator
-            Sensor intervention = monitoringToIntervention.get(base);
-
-            if (intervention instanceof InterventionSensor inter) {
-                inter.trigger(); // Aggiorna statistiche e stampa
-                System.out.println("Attivato intervento per: " + base.getId() +
-                        " alle " + java.time.LocalDateTime.now());
-            }
+        System.out.println("---- UNSORTED PA----");
+        for (Sensor s : alarmQueue) {
+            MonitoringSensor ms = (MonitoringSensor) getBaseSensor(s);
+            System.out.println(ms.getId() + " -> " + ms.getLastAlarmTime());
         }
-    }
 
-    public void processStopAlarms() {
-        while (!stopAlarmQueue.isEmpty()) {
-            Sensor monitor = stopAlarmQueue.poll();
-            Sensor base = getBaseSensor(monitor); // IMPORTANTE per decorator
+        // Copia della queue
+        List<Sensor> sortedAlarms = new ArrayList<>(alarmQueue);
+        // Ordinamento per timestamp
+        sortedAlarms.sort(Comparator.comparing(s -> ((MonitoringSensor) getBaseSensor(s)).getLastAlarmTime()));
+
+        // STAMPA ORDINATA
+        System.out.println("---- SORTED PA----");
+        for (Sensor s : sortedAlarms) {
+            MonitoringSensor ms = (MonitoringSensor) getBaseSensor(s);
+            System.out.println(ms.getId() + " -> " + ms.getLastAlarmTime());
+        }
+
+        for (Sensor monitor : sortedAlarms) {
+            Sensor base = getBaseSensor(monitor);
             Sensor intervention = monitoringToIntervention.get(base);
-
-            if (intervention instanceof InterventionSensor inter) {
-                if (inter.isActive()) {
-                    inter.deactivate();
-                    System.out.println(
-                            "Disattivato intervento per: " + base.getId() + " alle " + java.time.LocalDateTime.now());
+            if (intervention instanceof InterventionSensor inter && base instanceof MonitoringSensor ms) {
+                // Attiva l’intervento solo se non è già attivo
+                if (!inter.isActive()) {
+                    inter.trigger(); // aggiorna statistiche e timestamp
+                    System.out.println("⚠ ALLARME ATTIVATO su sensore " + ms.getId());
+                    System.out.println("Intervento attivato su sensore " + inter.getId() + " alle ore "
+                            + inter.getLastActivationTime());
                 }
             }
         }
     }
 
-    public void stopAlarm(String monitorId) {
-        Sensor monitor = sensors.stream()
-                .filter(s -> s.getId().equals(monitorId))
-                .findFirst()
-                .orElse(null);
+    // Processa gli allarmi cessati in ordine FIFO temporale
+    public void processStopAlarms() {
+        System.out.println("---- UNSORTED PA----");
+        for (Sensor s : stopAlarmQueue) {
+            MonitoringSensor ms = (MonitoringSensor) getBaseSensor(s);
+            System.out.println(ms.getId() + " -> " + ms.getLastAlarmTime());
+        }
 
+        // Ordina la lista in base al tempo di attivazione originale dell'allarme
+        List<Sensor> sortedStops = new ArrayList<>(stopAlarmQueue);
+        sortedStops.sort(Comparator.comparing(s -> ((MonitoringSensor) s).getLastAlarmTime()));
+
+        // STAMPA ORDINATA
+        System.out.println("---- SORTED PA----");
+        for (Sensor s : sortedStops) {
+            MonitoringSensor ms = (MonitoringSensor) getBaseSensor(s);
+            System.out.println(ms.getId() + " -> " + ms.getLastAlarmTime());
+        }
+
+        for (Sensor monitor : sortedStops) {
+            Sensor base = getBaseSensor(monitor);
+            Sensor intervention = monitoringToIntervention.get(base);
+            if (intervention instanceof InterventionSensor inter && base instanceof MonitoringSensor ms) {
+                // Disattiva l’intervento solo se è attivo
+                if (inter.isActive()) {
+                    inter.deactivate();
+                    System.out.println("✔ ALLARME DISATTIVATO su sensore " + ms.getId());
+                    System.out.println("Disattivato intervento per: " + inter.getId() + " alle ore "
+                            + java.time.LocalDateTime.now());
+                    alarmQueue.remove(base);
+                }
+            }
+        }
+        stopAlarmQueue.clear();
+    }
+
+    public void stopAlarm(String monitorId) {
+        Sensor monitor = sensors.stream().filter(s -> s.getId().equals(monitorId)).findFirst().orElse(null);
         if (monitor == null) {
             System.out.println("Sensore non trovato.");
             return;
         }
-
         currentState.handleStopAlarm(this, monitor);
     }
 
