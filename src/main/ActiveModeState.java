@@ -3,32 +3,29 @@ package main;
 import model.Sensor;
 
 public class ActiveModeState extends SystemState {
+    // =============================
+    // GETTER / STATO DEL SISTEMA
+    // =============================
+
+    // Restituisce true perché questo stato rappresenta la modalità attivata
     @Override
     public boolean isActivated() {
         return true;
     }
 
+    // =============================
+    // INSTALLAZIONE / RESET SENSORI
+    // =============================
+
+    // In modalità ATTIVATO non si possono installare nuovi sensori
     @Override
     public void installSensor(HomeSystem system, Sensor sensor) {
-        // In modalità attivato non si possono installare nuovi sensori
         System.out.println("Impossibile installare sensori in modalità ATTIVATO");
     }
 
+    // In modalità ATTIVATO non si possono resettare i sensori
     @Override
     public void resetSensors(HomeSystem system) {
-        // In modalità attivato non si possono resettare sensori
         System.out.println("Impossibile resettare sensori in modalità ATTIVATO");
-    }
-
-    @Override
-    public void handleAlarm(HomeSystem system, Sensor monitor) {
-        system.enqueueAlarm(monitor);
-        system.processAlarms();
-    }
-
-    @Override
-    public void handleStopAlarm(HomeSystem system, Sensor monitor) {
-        system.enqueueStopAlarm(monitor);
-        system.processStopAlarms();
     }
 }

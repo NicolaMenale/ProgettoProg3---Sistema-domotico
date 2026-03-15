@@ -3,7 +3,6 @@ package main;
 import model.*;
 
 import java.time.LocalDateTime;
-//import java.time.LocalDateTime;
 import java.util.*;
 import data.*;
 import decorator.SensorDecorator;
@@ -17,12 +16,12 @@ public class HomeSystem {
     private Queue<Sensor> stopAlarmQueue = new LinkedList<>();
     List<Sensor> currentAlarms;
 
-    // ===== Costruttore =====
+    // Costruttore 
     public HomeSystem() {
         sensors = new ArrayList<>();
     }
 
-    // ===== Cambio stato =====
+    // Cambio stato 
     public void setState(SystemState state) {
         this.currentState = state;
     }
@@ -46,6 +45,10 @@ public class HomeSystem {
     // =========================
     // INSTALLAZIONE SENSORI
     // =========================
+    public void installSensors(){
+        currentState.installSensors(this);
+    }
+
     public void installMonitoringPair(String monitorType, String interventionType, int threshold) {
         // Crea i sensori tramite Factory internamente
         SensorFactory monitorFactory = SensorFactoryProvider.getFactory(monitorType, threshold);
@@ -56,20 +59,13 @@ public class HomeSystem {
                 .createSensor(interventionType + (countSensorsByType(interventionType) + 1));
 
         // Installa i sensori
-        installSensor(monitorSensor);
-        installSensor(interventionSensor);
+        sensors.add(monitorSensor);
+        sensors.add(interventionSensor);
 
         // Registra la coppia
         addMonitoringPair(monitorSensor, interventionSensor);
 
         System.out.println("Coppia installata: " + monitorSensor.getId() + " ↔ " + interventionSensor.getId());
-    }
-
-    public void installSensor(Sensor sensor) {
-        if (currentState == null) {
-            throw new IllegalStateException("Stato del sistema non impostato!");
-        }
-        currentState.installSensor(this, sensor);
     }
 
     public void addMonitoringPair(Sensor monitor, Sensor intervention) {
@@ -85,18 +81,15 @@ public class HomeSystem {
 
     // ===== Conteggio sensori di un certo tipo =====
     public long countSensorsByType(String prefix) {
-        return sensors.stream()
-                .filter(s -> s.getId().startsWith(prefix))
-                .count();
-    }
-
-    public void addSensorInternal(Sensor sensor) {
-        sensors.add(sensor);
+        return sensors.stream().filter(s -> s.getId().startsWith(prefix)).count();
     }
 
     // =========================
     // MOSTRA SENSORI INSTALLATI
     // =========================
+    public void showSensorsS(){
+        currentState.showSensors(this);
+    }
 
     public void showSensors() {
         if (sensors.isEmpty()) {
@@ -151,6 +144,9 @@ public class HomeSystem {
     // =========================
     // RESET SENSORI
     // =========================
+    public void resetSensorByIdS(){
+        currentState.resetSensorByIdS(this);
+    }
 
     public boolean resetSensorById(String id) {
         for (int i = 0; i < sensors.size(); i++) {
@@ -158,21 +154,25 @@ public class HomeSystem {
             if (s.getId().equals(id)) {
                 sensors.get(i).reset(); // chiama reset anche su eventuali decorator
                 return true;
-            }
+            } 
         }
         return false;
     }
 
-    public void resetSensors() {
-        if (currentState == null) {
-            throw new IllegalStateException("Stato del sistema non impostato!");
-        }
-        currentState.resetSensors(this);
+    public void resetSensorsS(){
+        currentState.resetSensorsS(this);
+    }
+
+    public void resetSensors(HomeSystem system) {
+        system.getSensors().forEach(Sensor::reset);
     }
 
     // =========================
     // AGGIUNTA MODULI A SENSORI
     // =========================
+    public void installModules(){
+        currentState.installModules(this);
+    }
 
     public boolean addModuleToSensor(String sensorId, String moduleName) {
         int index = -1;
@@ -203,8 +203,11 @@ public class HomeSystem {
     // =========================
     // MOSTRA STATISTICHE SENSORI
     // =========================
+    public void showStatisticsS(){
+        currentState.showStatisticsS(this);
+    }
 
-    public void getAllStatistics() {
+    public void showStatistics() {
 
         if (sensors.isEmpty()) {
             System.out.println("Nessun sensore installato.");
@@ -261,8 +264,12 @@ public class HomeSystem {
     // =========================
     // SIMULAZIONE MONITORAGGIO/INTERVENTI
     // ========================
+    public void simulateSensorCycleS(){
+        currentState.simulateSensorCycleS(this);
+    }
 
     public List<String> simulateSensorCycle() {
+        simulateSensorCycleS();
         List<String> logs = new ArrayList<>();
 
         if (!currentState.isActivated()) {
@@ -393,15 +400,6 @@ public class HomeSystem {
             }
         }
         stopAlarmQueue.clear();
-    }
-
-    public void stopAlarm(String monitorId) {
-        Sensor monitor = sensors.stream().filter(s -> s.getId().equals(monitorId)).findFirst().orElse(null);
-        if (monitor == null) {
-            System.out.println("Sensore non trovato.");
-            return;
-        }
-        currentState.handleStopAlarm(this, monitor);
     }
 
     public void clearAlarmQueues() {
