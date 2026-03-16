@@ -1,14 +1,23 @@
 package model;
 
+// =============================
+// CLASSE ASTRATTA: SENSOR
+// =============================
+//
+// Rappresenta un sensore generico del sistema domotico.
+// Tutti i sensori (monitoraggio o intervento) estendono questa classe.
+// Contiene attributi comuni, gestione dello stato e metodi astratti
+// che devono essere implementati dalle sottoclassi.
+//
 public abstract class Sensor {
 
     // =============================
     // ATTRIBUTI BASE DEL SENSORE
     // =============================
 
-    protected String id;          // identificativo univoco del sensore
-    protected boolean active;     // indica se il sensore è attivo o disattivo
-    protected String modeString = "OFFLINE"; // stato testuale del sensore (default: modalità collaudo)
+    protected String id;              // identificativo univoco del sensore
+    protected boolean active;         // indica se il sensore è attivo (true) o disattivo (false)
+    protected String modeString = "OFFLINE"; // stato testuale del sensore (es: OFFLINE, ONLINE)
 
     // =============================
     // COSTRUTTORE
@@ -35,19 +44,18 @@ public abstract class Sensor {
     // GETTER
     // =============================
 
-    // Restituisce la modalità attuale del sensore
+    // Restituisce la modalità testuale attuale del sensore
     public String getModeString() {
         return modeString;
     }
 
-    // Restituisce l'identificativo del sensore
+    // Restituisce l'identificativo univoco del sensore
     public String getId() {
         return id;
     }
 
     // Restituisce lo stato di attivazione del sensore
-    // true = attivo
-    // false = disattivo
+    // true = attivo, false = disattivo
     public boolean isActive() {
         return active;
     }
@@ -70,13 +78,12 @@ public abstract class Sensor {
     // METODI ASTRATTI
     // =============================
 
-    // Reset del sensore.
-    // Deve essere implementato dalle sottoclassi (es. sensori di monitoraggio o intervento)
-    // e serve a riportare il sensore allo stato iniziale.
+    // Riporta il sensore allo stato iniziale.
+    // Deve essere implementato da tutte le sottoclassi (es. MonitoringSensor, InterventionSensor)
     public abstract void reset();
 
-    // Restituisce le statistiche del sensore
-    // (es. numero di allarmi, interventi eseguiti, ecc.)
-    // Ogni tipo di sensore implementa le proprie statistiche.
+    // Restituisce le statistiche del sensore.
+    // Ogni tipo di sensore può fornire informazioni specifiche
+    // come numero di letture, soglia superata, interventi eseguiti ecc.
     public abstract String getStatistics();
 }

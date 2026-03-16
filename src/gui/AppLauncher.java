@@ -11,45 +11,65 @@ import data.FileManager;
 import model.Sensor;
 import java.util.List;
 
+// ==============================
+// LAUNCHER APPLICAZIONE GUI
+// ==============================
+//
+// Classe principale che avvia il sistema domotico con GUI JavaFX.
+// Carica sensori, statistiche e apre la finestra principale.
+//
 public class AppLauncher extends Application {
 
-    // Riferimento statico condiviso al sistema
+    // Riferimento statico condiviso al sistema domotico
     private static HomeSystem system;
 
+    // ==============================
+    // PUNTO DI INGRESSO MAIN
+    // ==============================
     public static void main(String[] args) {
-        // 1️⃣ Creazione del sistema
+
+        // Creazione del sistema
         system = new HomeSystem();
+
+        // Imposta stato iniziale in modalità Collaudo
         system.setState(new TestModeState());
-        // 2️⃣ Caricamento sensori
+
+        // Caricamento sensori dal file
         List<Sensor> sensors = FileManager.loadSensors();
         system.setSensors(sensors);
+
+        // Ricostruisce le coppie di monitoraggio / intervento
         system.rebuildMonitoringPairs();
 
-        // 3️⃣ Caricamento statistiche
+        // Caricamento statistiche sensori
         FileManager.loadStatistics(sensors);
 
-        // 4️⃣ Lancia la GUI
+        // Avvia la GUI
         launch(args);
     }
 
+    // ==============================
+    // AVVIO GUI (JavaFX start)
+    // ==============================
     @Override
     public void start(Stage stage) throws Exception {
-        // Carica il file FXML
+
+        // Carica la scena principale da FXML
         FXMLLoader loader = new FXMLLoader(getClass().getResource("ControlPanelView.fxml"));
         Parent root = loader.load();
 
-        // Passa il sistema al controller
+        // Passa il sistema domotico al controller
         ControlPanelController controller = loader.getController();
         controller.setSystem(system);
 
-        // Mostra la scena
+        // Imposta la scena e mostra la finestra principale
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Sistema Domotico");
         stage.show();
 
+        // Gestione chiusura finestra: salva dati
         stage.setOnCloseRequest(event -> {
-            // Salva dati prima di chiudere
             System.out.println("Salvataggio dati prima di uscire...");
             FileManager.saveSensors(system.getSensors());
             FileManager.saveStatistics(system.getSensors());

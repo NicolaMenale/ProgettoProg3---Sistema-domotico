@@ -1,11 +1,19 @@
 package main;
 
-import model.Sensor;
-
+// ==============================
+// CLASSE: ACTIVE MODE STATE
+// ==============================
+//
+// Rappresenta lo stato “ATTIVATO” del sistema domotico.
+// In questa modalità il sistema è pienamente operativo.
+// I sensori sono attivi e alcune operazioni di configurazione
+// (installazione / reset) possono essere bloccate.
+// 
 public class ActiveModeState extends SystemState {
-    // =============================
+
+    // ==============================
     // GETTER / STATO DEL SISTEMA
-    // =============================
+    // ==============================
 
     // Restituisce true perché questo stato rappresenta la modalità attivata
     @Override
@@ -13,19 +21,26 @@ public class ActiveModeState extends SystemState {
         return true;
     }
 
-    // =============================
-    // INSTALLAZIONE / RESET SENSORI
-    // =============================
+    // ==============================
+    // OPERAZIONI SUI SENSORI
+    // ==============================
 
-    // In modalità ATTIVATO non si possono installare nuovi sensori
+    // Mostra tutti i sensori installati tramite HomeSystem
     @Override
-    public void installSensor(HomeSystem system, Sensor sensor) {
-        System.out.println("Impossibile installare sensori in modalità ATTIVATO");
+    public void showSensors(HomeSystem system) {
+        system.showSensors();
     }
 
-    // In modalità ATTIVATO non si possono resettare i sensori
+    // Mostra le statistiche di tutti i sensori tramite HomeSystem
     @Override
-    public void resetSensors(HomeSystem system) {
-        System.out.println("Impossibile resettare sensori in modalità ATTIVATO");
+    public void showStatisticsS(HomeSystem system) {
+        system.showStatistics();
+    }
+
+    // Simula un ciclo dei sensori (letture, allarmi, interventi)
+    @Override
+    public void simulateSensorCycleS(HomeSystem system) {
+        // Logica reale gestita da HomeSystem
+        // Questo metodo viene sovrascritto solo per consentire l’invocazione
     }
 }

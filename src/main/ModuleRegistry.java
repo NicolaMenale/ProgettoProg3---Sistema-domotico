@@ -5,14 +5,27 @@ import java.util.function.Function;
 import model.*;
 import decorator.*;
 
+// ==============================
+// CLASSE: ModuleRegistry
+// ==============================
+//
+// Gestisce tutti i moduli aggiuntivi disponibili per i sensori
+// e crea decoratori per installarli sui sensori.
+// Contiene:
+//   - mappatura sensori -> moduli disponibili
+//   - factory per creare i decoratori
+//
 public class ModuleRegistry {
 
     // ==============================
     // MODULI DISPONIBILI PER TIPO SENSORE
     // ==============================
 
+    // Mappa tra tipo base sensore e lista dei moduli disponibili
     private static final Map<String, List<String>> SENSOR_MODULES = new HashMap<>();
+
     static {
+        // Sensori di monitoraggio
         SENSOR_MODULES.put("TEMPERATURE", Arrays.asList("AudioModule", "VideoModule", "NotificationModule",
                 "LoggingModule", "SensorCalibrationModule"));
 
@@ -28,6 +41,7 @@ public class ModuleRegistry {
         SENSOR_MODULES.put("MOVEMENT", Arrays.asList("AudioModule", "VideoModule", "NotificationModule",
                 "LoggingModule", "SensorCalibrationModule"));
 
+        // Sensori di intervento
         SENSOR_MODULES.put("AIRCONDITIONER", Arrays.asList("RemoteControlModule", "AlarmModule",
                 "LoggingModule", "FlowMonitoringModule", "NotificationModule"));
 
@@ -48,122 +62,78 @@ public class ModuleRegistry {
     // FACTORY DEI DECORATOR
     // ==============================
 
+    // Mappa tra nome modulo e funzione per creare il decoratore
     private static final Map<String, Function<Sensor, Sensor>> MODULE_CREATORS = new HashMap<>();
+
     static {
-        MODULE_CREATORS.put("AudioModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new AudioModule(s);
-            }
-        });
-        MODULE_CREATORS.put("VideoModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new VideoModule(s);
-            }
-        });
-        MODULE_CREATORS.put("NotificationModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new NotificationModule(s);
-            }
-        });
-        MODULE_CREATORS.put("LoggingModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new LoggingModule(s);
-            }
-        });
-        MODULE_CREATORS.put("SensorCalibrationModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new SensorCalibrationModule(s);
-            }
-        });
-        MODULE_CREATORS.put("AnalyticsModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new AnalyticsModule(s);
-            }
-        });
-        MODULE_CREATORS.put("SmokeDetectionModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new SmokeDetectionModule(s);
-            }
-        });
-        MODULE_CREATORS.put("GasLeakModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new GasLeakModule(s);
-            }
-        });
-        MODULE_CREATORS.put("RemoteControlModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new RemoteControlModule(s);
-            }
-        });
-        MODULE_CREATORS.put("AlarmModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new AlarmModule(s);
-            }
-        });
-        MODULE_CREATORS.put("FlowMonitoringModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new FlowMonitoringModule(s);
-            }
-        });
-        MODULE_CREATORS.put("VentModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new VentModule(s);
-            }
-        });
-        MODULE_CREATORS.put("LockModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new LockModule(s);
-            }
-        });
-        MODULE_CREATORS.put("PowerCalibrationModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new PowerCalibrationModule(s);
-            }
-        });
-        MODULE_CREATORS.put("PowerModule", new Function<Sensor, Sensor>() {
-            public Sensor apply(Sensor s) {
-                return new PowerModule(s);
-            }
-        });
+        // Crea ogni modulo come decoratore su un sensore
+        MODULE_CREATORS.put("AudioModule", s -> new AudioModule(s));
+        MODULE_CREATORS.put("VideoModule", s -> new VideoModule(s));
+        MODULE_CREATORS.put("NotificationModule", s -> new NotificationModule(s));
+        MODULE_CREATORS.put("LoggingModule", s -> new LoggingModule(s));
+        MODULE_CREATORS.put("SensorCalibrationModule", s -> new SensorCalibrationModule(s));
+        MODULE_CREATORS.put("AnalyticsModule", s -> new AnalyticsModule(s));
+        MODULE_CREATORS.put("SmokeDetectionModule", s -> new SmokeDetectionModule(s));
+        MODULE_CREATORS.put("GasLeakModule", s -> new GasLeakModule(s));
+        MODULE_CREATORS.put("RemoteControlModule", s -> new RemoteControlModule(s));
+        MODULE_CREATORS.put("AlarmModule", s -> new AlarmModule(s));
+        MODULE_CREATORS.put("FlowMonitoringModule", s -> new FlowMonitoringModule(s));
+        MODULE_CREATORS.put("VentModule", s -> new VentModule(s));
+        MODULE_CREATORS.put("LockModule", s -> new LockModule(s));
+        MODULE_CREATORS.put("PowerCalibrationModule", s -> new PowerCalibrationModule(s));
+        MODULE_CREATORS.put("PowerModule", s -> new PowerModule(s));
     }
 
-    /**
-     * Restituisce i moduli disponibili per un sensore,
-     * escludendo quelli già installati.
-     */
+    // ==============================
+    // METODI PUBBLICI
+    // ==============================
+
+    // Restituisce la lista dei moduli disponibili per un sensore
+    // Esclude quelli già installati
     public static List<String> getAvailableModules(Sensor sensor) {
+        // ottiene il sensore base senza decoratori
         Sensor baseSensor = getBaseSensor(sensor);
+
+        // prende il prefisso dell'ID (es. TEMPERATURE1 -> TEMPERATURE)
         String prefix = baseSensor.getId().replaceAll("\\d+$", "");
 
+        // prende tutti i moduli disponibili per il tipo e rimuove quelli già installati
         List<String> available = new ArrayList<>(SENSOR_MODULES.getOrDefault(prefix, Collections.<String>emptyList()));
         available.removeAll(getInstalledModules(sensor));
+
         return available;
     }
 
-    /**
-     * Crea un modulo decoratore a partire dal nome.
-     */
+    // Crea un modulo decoratore a partire dal nome del modulo
     public static Sensor createModule(String moduleName, Sensor sensor) {
         Function<Sensor, Sensor> creator = MODULE_CREATORS.get(moduleName);
-        if (creator == null)
+        if (creator == null) // modulo non trovato
             return null;
-        return creator.apply(sensor);
+
+        return creator.apply(sensor); // ritorna il sensore decorato
     }
 
-    // Ottiene il sensore base senza decoratori
+    // ==============================
+    // METODI PRIVATI / HELPERS
+    // ==============================
+
+    // Restituisce il sensore base senza i decoratori
     private static Sensor getBaseSensor(Sensor sensor) {
         Sensor current = sensor;
+
+        // rimuove tutti i decoratori fino a tornare al sensore originale
         while (current instanceof SensorDecorator) {
             current = ((SensorDecorator) current).getWrappedSensor();
         }
+
         return current;
     }
 
-    // Tutti i moduli installati (da tutti i decoratori)
+    // Restituisce la lista dei moduli installati su un sensore
     public static List<String> getInstalledModules(Sensor sensor) {
         if (sensor instanceof SensorDecorator sd) {
-            return sd.getModules();
+            return sd.getModules(); // prende i moduli dal decoratore
         }
-        return new ArrayList<>();
+        return new ArrayList<>(); // sensore base senza moduli
     }
 }

@@ -3,16 +3,28 @@ package decorator;
 import model.Sensor;
 import java.util.*;
 
+// ==============================
+// DECORATOR ASTRACT PER SENSORI
+// ==============================
+//
+// Permette di aggiungere moduli ai sensori senza modificare
+// le classi concrete dei sensori stessi.
+// Mantiene lista dei moduli installati e riferimento al sensore originale.
+//
 public abstract class SensorDecorator extends Sensor {
 
-    protected Sensor wrappedSensor;
+    protected Sensor wrappedSensor; // sensore originale decorato
     protected List<String> modules; // lista dei moduli installati
 
+    // ==============================
+    // COSTRUTTORE
+    // ==============================
+    // Inizializza il decoratore a partire da un sensore
     public SensorDecorator(Sensor sensor) {
         super(sensor.getId());
         this.wrappedSensor = sensor;
 
-        // ereditiamo eventuali moduli già installati
+        // eredita eventuali moduli già installati se il sensore è un decoratore
         if (sensor instanceof SensorDecorator sd) {
             this.modules = new ArrayList<>(sd.modules);
         } else {
@@ -20,30 +32,38 @@ public abstract class SensorDecorator extends Sensor {
         }
     }
 
+    // ==============================
+    // GETTER MODULI
+    // ==============================
+
+    // Restituisce il nome del modulo corrente (ultimo aggiunto)
     public String getModuleName() {
-        // Restituisce l'ultimo modulo aggiunto (per convenzione)
         if (modules.isEmpty())
             return "Decoratore generico";
         return modules.get(modules.size() - 1);
     }
 
+    // Restituisce il sensore decorato
     public Sensor getWrappedSensor() {
         return wrappedSensor;
     }
 
+    // Restituisce tutti i moduli installati, incluso questo decoratore
     public List<String> getModules() {
         List<String> modules = new ArrayList<>();
         if (wrappedSensor instanceof SensorDecorator decorator) {
             modules.addAll(decorator.getModules());
         }
-        modules.add(getModuleName()); // il modulo di questo decoratore
+        modules.add(getModuleName());
         return modules;
     }
 
+    // Aggiunge un modulo alla lista dei moduli
     public void addModule(String moduleName) {
         modules.add(moduleName);
     }
 
+    // Restituisce il sensore base senza decoratori
     public Sensor getBaseSensor() {
         Sensor current = this;
         while (current instanceof SensorDecorator decorator) {
@@ -52,28 +72,33 @@ public abstract class SensorDecorator extends Sensor {
         return current;
     }
 
-    // =========================
+    // ==============================
     // RESET
-    // =========================
+    // ==============================
 
-    // Reset completo (base + modulo)
+    // Reset completo del sensore base
     @Override
     public void reset() {
         wrappedSensor.reset();
     }
 
+    // ==============================
+    // STATISTICHE
+    // ==============================
+
+    // Restituisce statistiche complete del sensore e moduli
     @Override
     public String getStatistics() {
 
-        // 1️⃣ prendi il sensore base
+        // prendi il sensore base
         Sensor base = getBaseSensor(this);
 
         StringBuilder sb = new StringBuilder();
 
-        // 2️⃣ aggiungi le statistiche del sensore base
+        // aggiungi statistiche del sensore base
         sb.append(base.getStatistics());
 
-        // 3️⃣ raccogli tutti i moduli decoratori
+        // raccogli tutti i moduli decoratori
         List<String> modules = new ArrayList<>();
         Sensor current = this;
 
@@ -82,17 +107,20 @@ public abstract class SensorDecorator extends Sensor {
             current = dec.getWrappedSensor();
         }
 
-        // 4️⃣ ordine corretto (base → ultimo modulo)
+        // ordine corretto (base → ultimo modulo)
         Collections.reverse(modules);
 
-        // 5️⃣ aggiungi i moduli alla stringa
-        sb.append("  Moduli installati: ")
-                .append(String.join(", ", modules))
-                .append("\n");
+        // aggiungi i moduli alla stringa
+        sb.append("  Moduli installati: ").append(String.join(", ", modules)).append("\n");
 
         return sb.toString();
     }
 
+    // ==============================
+    // METODO PRIVATO DI SUPPORTO
+    // ==============================
+
+    // Restituisce il sensore base a partire da un sensore generico
     private Sensor getBaseSensor(Sensor sensor) {
         Sensor current = sensor;
         while (current instanceof SensorDecorator decorator) {

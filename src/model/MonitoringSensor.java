@@ -3,31 +3,39 @@ package model;
 import java.time.LocalDateTime;
 import java.util.*;
 
+// =============================
+// CLASSE: MONITORING SENSOR
+// =============================
+//
+// Rappresenta un sensore di monitoraggio.
+// Memorizza letture, soglia, storico degli allarmi e statistiche.
+// Estende la classe astratta Sensor.
+//
 public class MonitoringSensor extends Sensor {
 
     // =============================
-    // ATTRIBUTI SPECIFICI DEL SENSORE DI MONITORAGGIO
+    // ATTRIBUTI SPECIFICI DEL SENSORE
     // =============================
 
-    private int threshold; // soglia oltre la quale scatta l'allarme
-    private List<Double> readings; // lista delle letture rilevate dal sensore
+    private int threshold;                  // soglia oltre la quale scatta l'allarme
+    private List<Double> readings;          // lista delle letture rilevate
     private List<LocalDateTime> alarmHistory; // storico delle date in cui è scattato un allarme
-    private LocalDateTime lastAlarmTime; // ultima volta in cui è scattato un allarme
-    private int alarmCount = 0; // numero totale di allarmi generati
+    private LocalDateTime lastAlarmTime;    // ultima volta in cui è scattato un allarme
+    private int alarmCount = 0;             // numero totale di allarmi generati
 
     // =============================
     // COSTRUTTORE
     // =============================
 
-    // Crea un sensore di monitoraggio con ID e soglia.
-    // Inizializza le liste per letture e storico allarmi.
+    // Crea un sensore di monitoraggio con ID e soglia
+    // Inizializza liste per letture e storico allarmi
     public MonitoringSensor(String id, int threshold) {
-        super(id);
+        super(id);                           // chiama il costruttore della superclasse
         this.threshold = threshold;
-        this.active = false;
-        this.readings = new ArrayList<>();
-        this.alarmHistory = new ArrayList<>();
-        this.lastAlarmTime = null;
+        this.active = false;                  // sensore inizialmente disattivo
+        this.readings = new ArrayList<>();    // lista letture vuota
+        this.alarmHistory = new ArrayList<>();// lista storico allarmi vuota
+        this.lastAlarmTime = null;            // nessun allarme ancora scattato
     }
 
     // =============================
@@ -59,7 +67,7 @@ public class MonitoringSensor extends Sensor {
         return alarmCount;
     }
 
-    // Metodo helper che indica che questo è un sensore di monitoraggio
+    // Indica che questo è un sensore di monitoraggio
     public boolean isMonitoring() {
         return true;
     }
@@ -84,37 +92,31 @@ public class MonitoringSensor extends Sensor {
     // LOGICA DI MONITORAGGIO
     // =============================
 
-    // Aggiunge una nuova lettura al sensore e verifica se scatta o termina un
-    // allarme
+    // Aggiunge una nuova lettura al sensore e verifica se scatta o termina un allarme
     public boolean addReading(double value) {
 
-        // salva la lettura
-        readings.add(value);
+        readings.add(value);                  // salva la lettura
 
         // Se il valore supera la soglia e il sensore non era già in allarme
         if (value > threshold && !active) {
+            active = true;                    // attiva lo stato di allarme
+            alarmCount++;                     // incrementa contatore allarmi
 
-            active = true; // attiva lo stato di allarme
-            alarmCount++; // incrementa contatore allarmi
-
-            // registra data e ora dell'allarme
-            lastAlarmTime = LocalDateTime.now();
-            alarmHistory.add(lastAlarmTime);
+            lastAlarmTime = LocalDateTime.now(); // registra data/ora allarme
+            alarmHistory.add(lastAlarmTime);     // aggiunge allarme allo storico
 
             System.out.println("ALLARME su sensore " + getId() + " alle ore " + lastAlarmTime);
 
-            return true; // nuovo allarme generato
+            return true;                      // nuovo allarme generato
         }
 
-        // Se il valore torna sotto la soglia e il sensore era in allarme
+        // Se il valore torna sotto soglia e il sensore era in allarme
         if (value <= threshold && active) {
-
-            active = false; // termina stato di allarme
-            return false; // fine allarme
+            active = false;                   // termina stato di allarme
+            return false;                     // fine allarme
         }
 
-        // Nessun cambiamento di stato
-        return active;
+        return active;                        // nessun cambiamento di stato
     }
 
     // =============================
@@ -124,22 +126,20 @@ public class MonitoringSensor extends Sensor {
     // Riporta il sensore allo stato iniziale
     @Override
     public void reset() {
-
-        readings.clear(); // cancella tutte le letture
-        alarmHistory.clear(); // cancella storico allarmi
-        lastAlarmTime = null; // rimuove ultimo allarme
-        alarmCount = 0; // reset contatore allarmi
-        active = false; // disattiva sensore
+        readings.clear();                     // cancella tutte le letture
+        alarmHistory.clear();                  // cancella storico allarmi
+        lastAlarmTime = null;                  // rimuove ultimo allarme
+        alarmCount = 0;                        // reset contatore allarmi
+        active = false;                        // disattiva sensore
     }
 
     // =============================
     // STATISTICHE DEL SENSORE
     // =============================
 
-    // Restituisce una stringa con tutte le informazioni e statistiche del sensore
+    // Restituisce una stringa con informazioni e statistiche del sensore
     @Override
     public String getStatistics() {
-
         StringBuilder sb = new StringBuilder();
 
         sb.append("- Sensore ID: ").append(id).append("\n");

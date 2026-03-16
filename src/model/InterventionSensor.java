@@ -3,13 +3,21 @@ package model;
 import java.time.LocalDateTime;
 import java.util.*;
 
+// =============================
+// CLASSE: INTERVENTION SENSOR
+// =============================
+//
+// Rappresenta un sensore di intervento.
+// Memorizza attivazioni, storico e statistiche.
+// Estende la classe astratta Sensor.
+//
 public class InterventionSensor extends Sensor {
 
     // =============================
     // ATTRIBUTI SPECIFICI DEL SENSORE DI INTERVENTO
     // =============================
 
-    private int activationCount = 0; // numero totale di attivazioni del sensore
+    private int activationCount = 0;          // numero totale di attivazioni del sensore
     private LocalDateTime lastActivationTime; // data e ora dell'ultima attivazione
     private List<LocalDateTime> activationHistory; // storico di tutte le attivazioni
 
@@ -17,13 +25,13 @@ public class InterventionSensor extends Sensor {
     // COSTRUTTORE
     // =============================
 
-    // Crea un sensore di intervento con ID.
-    // Inizializza il contatore e lo storico delle attivazioni.
+    // Crea un sensore di intervento con ID
+    // Inizializza contatore e storico attivazioni
     public InterventionSensor(String id) {
-        super(id);
-        this.activationCount = 0;
-        this.activationHistory = new ArrayList<>();
-        this.active = false;
+        super(id);                             // chiama il costruttore della superclasse
+        this.activationCount = 0;              // inizializza contatore
+        this.activationHistory = new ArrayList<>(); // inizializza lista storico
+        this.active = false;                    // sensore inizialmente disattivo
     }
 
     // =============================
@@ -67,18 +75,15 @@ public class InterventionSensor extends Sensor {
     // LOGICA DI INTERVENTO
     // =============================
 
-    // Attiva il sensore di intervento.
-    // Registra l'attivazione solo se il sensore non è già attivo.
+    // Attiva il sensore di intervento
+    // Registra l'attivazione solo se il sensore non era già attivo
     public void trigger() {
-
         if (!active) {
+            active = true;                     // attiva il sensore
+            activationCount++;                  // incrementa contatore attivazioni
 
-            active = true; // attiva il sensore
-            activationCount++; // incrementa il numero di attivazioni
-
-            // registra data e ora dell'attivazione
-            lastActivationTime = LocalDateTime.now();
-            activationHistory.add(lastActivationTime);
+            lastActivationTime = LocalDateTime.now(); // registra data/ora
+            activationHistory.add(lastActivationTime); // aggiunge all storico
 
             System.out.println("Intervento attivato su sensore " + id + " alle ore " + lastActivationTime);
         }
@@ -91,20 +96,19 @@ public class InterventionSensor extends Sensor {
     // Riporta il sensore allo stato iniziale
     @Override
     public void reset() {
-        activationCount = 0; // reset contatore attivazioni
-        lastActivationTime = null; // rimuove ultima attivazione
-        activationHistory.clear(); // cancella storico attivazioni
-        deactivate(); // disattiva il sensore
+        activationCount = 0;                    // reset contatore attivazioni
+        lastActivationTime = null;              // rimuove ultima attivazione
+        activationHistory.clear();              // cancella storico
+        deactivate();                            // disattiva il sensore
     }
 
     // =============================
     // STATISTICHE DEL SENSORE
     // =============================
 
-    // Restituisce una stringa con tutte le informazioni e statistiche del sensore
+    // Restituisce una stringa con informazioni e statistiche del sensore
     @Override
     public String getStatistics() {
-
         StringBuilder sb = new StringBuilder();
 
         sb.append("- Sensore ID: ").append(id).append("\n");
