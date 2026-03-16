@@ -199,19 +199,6 @@ public class ControlPanelController {
     }
 
     // ==============================
-    // HELPER
-    // ==============================
-
-    // Ottiene il sensore base senza decorator
-    private Sensor getBaseSensor(Sensor s) {
-        Sensor current = s;
-        while (current instanceof SensorDecorator dec) {
-            current = dec.getWrappedSensor();
-        }
-        return current;
-    }
-
-    // ==============================
     // FINSTRE SECONDARIE
     // ==============================
 
@@ -329,6 +316,19 @@ public class ControlPanelController {
                 alarmQueueArea.appendText(line + "\n");
             }
         }
+    }
+
+    // ==============================
+    // HELPER
+    // ==============================
+
+    // Ottiene il sensore base senza decorator
+    private Sensor getBaseSensor(Sensor s) {
+        Sensor current = s;
+        while (current instanceof SensorDecorator dec) {
+            current = dec.getWrappedSensor();
+        }
+        return current;
     }
 
     // ==============================

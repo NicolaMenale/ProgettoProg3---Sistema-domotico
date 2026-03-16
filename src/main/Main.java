@@ -189,7 +189,7 @@ public class Main {
 
             // Stampa il menu reset sensori
             System.out.println("\n--- RESET SENSORI ---");
-            System.out.println("1. Reset singolo sensore");
+            System.out.println("1. Reset coppia sensori");
             System.out.println("2. Reset tutti i sensori");
             System.out.println("3. Cancellazione Totale");
             System.out.println("0. Torna indietro");
@@ -200,7 +200,7 @@ public class Main {
 
             switch (choice) {
 
-                case 1 -> { // reset singolo sensore
+                case 1 -> { // reset coppia di sensori
 
                     // Ottiene la lista dei sensori installati
                     List<String> sensorInfo = system.getSensorInfo();
@@ -213,9 +213,7 @@ public class Main {
 
                     // Mostra la lista dei sensori
                     System.out.println("\nSeleziona sensore da resettare:");
-                    for (int i = 0; i < sensorInfo.size(); i++) {
-                        System.out.println((i + 1) + ". " + sensorInfo.get(i));
-                    }
+                    system.printPairSensor();
                     System.out.println("0. Annulla");
                     System.out.print("Scelta: ");
 
@@ -239,7 +237,7 @@ public class Main {
                     if (sensorId != null) {
                         boolean success = system.resetSensorById(sensorId);
                         if (success)
-                            System.out.println("Sensore " + sensorId + " resettato (base + moduli).");
+                            System.out.println("Coppia Resettata");
                         else
                             System.out.println("Errore nel resettare il sensore " + sensorId);
                     }

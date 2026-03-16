@@ -66,7 +66,7 @@ public class ResetController {
         if (sensorId != null) {
             boolean success = system.resetSensorById(sensorId); // HomeSystem gestisce il reset completo
             if (success) {
-                System.out.println("Sensore " + sensorId + " resettato (base + moduli).");
+                System.out.println("Coppia Resettata");
             } else {
                 System.out.println("Errore nel resettare il sensore " + sensorId);
             }
