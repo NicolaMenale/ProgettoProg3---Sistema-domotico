@@ -31,6 +31,15 @@ public class AppLauncher extends Application {
         // Creazione del sistema
         system = new HomeSystem();
 
+        // Gestore globale delle eccezioni non catturate
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            System.out.println("ERRORE FATALE: " + throwable.getMessage());
+            System.out.println("Salvataggio dati prima di terminare...");
+            FileManager.saveSensors(system.getSensors());
+            FileManager.saveStatistics(system.getSensors());
+            throwable.printStackTrace();
+        });
+
         // Imposta stato iniziale in modalità Collaudo
         system.setState(new TestModeState());
 

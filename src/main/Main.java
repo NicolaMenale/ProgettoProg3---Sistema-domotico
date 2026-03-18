@@ -105,8 +105,7 @@ public class Main {
     // ==============================
     private static void installSensors(HomeSystem system) {
 
-        // Chiede al sistema di iniziare l’installazione (può controllare lo stato e
-        // bloccare se non permesso)
+        // Chiede al sistema di iniziare l’installazione (può controllare lo stato e bloccare se non permesso)
         system.installSensors();
 
         boolean back = false; // flag per uscire dal menu
@@ -158,14 +157,9 @@ public class Main {
                     // Chiede all’utente il valore di soglia per il sensore di monitoraggio
                     System.out.print("Inserisci valore soglia (threshold) per il sensore " + monitorType + ": ");
                     int threshold = scanner.nextInt();
-
-                    try {
-                        // Installa la coppia di sensori tramite HomeSystem
-                        system.installMonitoringPair(monitorType, interventionType, threshold);
-                    } catch (IllegalArgumentException e) {
-                        // Gestione errore se la coppia non può essere installata
-                        System.out.println("Errore: " + e.getMessage());
-                    }
+                    
+                    // Installa la coppia di sensori tramite HomeSystem
+                    system.installMonitoringPair(monitorType, interventionType, threshold);
                 }
 
                 case 0 -> back = true; // esce dal menu

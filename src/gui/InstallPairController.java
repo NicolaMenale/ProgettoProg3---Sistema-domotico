@@ -73,6 +73,7 @@ public class InstallPairController {
     // Viene chiamato al click sul pulsante "Installa"
     @FXML
     private void installPair() {
+        
         try {
             // Ottiene l'indice della coppia selezionata
             int choice = typeComboBox.getSelectionModel().getSelectedIndex();

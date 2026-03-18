@@ -40,12 +40,10 @@ public class MonitoringSensorFactory extends SensorFactory {
 
         // Restituisce un oggetto MonitoringSensor corretto in base al tipo
         return switch (prefix) {
-            case "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" ->
-                new MonitoringSensor(id, threshold);
+            case "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" -> new MonitoringSensor(id, threshold);
 
             // Se il prefisso non è valido, genera eccezione
-            default ->
-                throw new IllegalArgumentException("Tipo sensore monitoraggio non valido: " + prefix);
+            default -> throw new IllegalArgumentException("Tipo sensore monitoraggio non valido: " + prefix);
         };
     }
 }

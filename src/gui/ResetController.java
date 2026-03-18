@@ -77,12 +77,7 @@ public class ResetController {
     // Resetta tutti i sensori presenti nel sistema
     @FXML
     private void resetAllSensors() {
-        try {
-            system.resetSensorsS(); // HomeSystem gestisce internamente il reset
-            System.out.println("Tutti i sensori e moduli sono stati resettati.");
-        } catch (IllegalStateException e) { // cattura eventuale blocco dello stato
-            System.out.println("Errore: stato del sistema non impostato!");
-        }
+        system.resetSensorsS(); // HomeSystem gestisce internamente il reset
         mainController.refreshSensorList(); // aggiorna la tabella dei sensori
     }
 

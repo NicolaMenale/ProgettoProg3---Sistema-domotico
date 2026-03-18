@@ -205,12 +205,7 @@ public class ControlPanelController {
     // Apre finestra per installare coppia di sensori
     @FXML
     private void openInstallPairWindow() throws IOException {
-        try {
-            system.installSensors(); // verifica permessi stato
-        } catch (IllegalStateException e) {
-            addLog(e.getMessage());
-            return;
-        }
+        system.installSensors(); // verifica permessi stato
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("InstallPairView.fxml"));
         Parent root = loader.load();
@@ -231,12 +226,7 @@ public class ControlPanelController {
     // Apre finestra reset sensori
     @FXML
     private void openResetWindow() throws IOException {
-        try {
-            system.resetSensorsS(); // verifica permessi stato
-        } catch (IllegalStateException e) {
-            addLog(e.getMessage());
-            return;
-        }
+        system.resetSensorsS(); // verifica permessi stato
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("ResetView.fxml"));
         Parent root = loader.load();
@@ -257,12 +247,7 @@ public class ControlPanelController {
     // Apre finestra decorazione sensore
     @FXML
     private void openDecorateWindow() throws IOException {
-        try {
-            system.installModules(); // verifica permessi stato
-        } catch (IllegalStateException e) {
-            addLog(e.getMessage());
-            return;
-        }
+        system.installModules(); // verifica permessi stato
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("DecorateSensorView.fxml"));
         Parent root = loader.load();
@@ -283,12 +268,7 @@ public class ControlPanelController {
 
     @FXML
     private void simulateCycle() {
-        try {
-            system.simulateSensorCycleS(); // verifica stato
-        } catch (IllegalStateException e) {
-            addLog(e.getMessage());
-            return;
-        }
+        system.simulateSensorCycleS(); // verifica stato
 
         List<String> logs = system.simulateSensorCycle(); // esegue ciclo sensori
         alarmQueue(); // aggiorna lista allarmi attivi
