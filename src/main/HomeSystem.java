@@ -17,8 +17,8 @@ import factory.*;
 //
 public class HomeSystem {
 
-    private Map<Sensor, Sensor> monitoringToIntervention = new HashMap<>(); // mappa monitor -> intervento
     private List<Sensor> sensors = new ArrayList<>(); // tutti i sensori installati
+    private Map<Sensor, Sensor> monitoringToIntervention = new HashMap<>(); // mappa monitor -> intervento
     private SystemState currentState; // stato corrente del sistema (Collaudo, Attivato, ecc.)
     private Queue<Sensor> alarmQueue = new LinkedList<>(); // coda degli allarmi attivi
     private Queue<Sensor> stopAlarmQueue = new LinkedList<>(); // coda per stop allarmi
@@ -36,10 +36,6 @@ public class HomeSystem {
     // ==============================
     public void setState(SystemState state) {
         this.currentState = state; // imposta lo stato corrente
-    }
-
-    public boolean isActivated() {
-        return currentState.isActivated(); // true se in modalità attivata
     }
 
     // ==============================

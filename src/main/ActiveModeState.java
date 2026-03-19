@@ -12,16 +12,6 @@ package main;
 public class ActiveModeState extends SystemState {
 
     // ==============================
-    // GETTER / STATO DEL SISTEMA
-    // ==============================
-
-    // Restituisce true perché questo stato rappresenta la modalità attivata
-    @Override
-    public boolean isActivated() {
-        return true;
-    }
-
-    // ==============================
     // OPERAZIONI SUI SENSORI
     // ==============================
 

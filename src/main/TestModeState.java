@@ -15,16 +15,6 @@ package main;
 public class TestModeState extends SystemState {
 
     // =============================
-    // GETTER / STATO DEL SISTEMA
-    // =============================
-
-    // Restituisce false perché il sistema non è in modalità attivata
-    @Override
-    public boolean isActivated() {
-        return false;
-    }
-
-    // =============================
     // INSTALLAZIONE SENSORI
     // =============================
 

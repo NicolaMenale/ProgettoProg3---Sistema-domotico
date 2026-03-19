@@ -13,15 +13,7 @@ package main;
 // La logica di gestione allarmi è centralizzata in HomeSystem.
 
 public abstract class SystemState {
-
-    // =============================
-    // GETTER / STATO
-    // =============================
-
-    // Indica se il sistema è in modalità attiva
-    // True = modalità ATTIVATO, False = modalità non attiva
-    public abstract boolean isActivated();
-
+    
     // =============================
     // COMPORTAMENTI SUL SISTEMA
     // =============================
