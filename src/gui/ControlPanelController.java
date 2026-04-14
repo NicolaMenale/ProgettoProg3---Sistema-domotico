@@ -11,13 +11,15 @@ import javafx.application.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.*;
 import main.*;
-import model.*;
+import state.AttivoState;
+import state.CollaudoState;
 
 import java.io.IOException;
 import java.util.*;
 
 import data.*;
 import decorator.SensorDecorator;
+import models.*;
 
 // ==============================
 // CONTROLLER PRINCIPALE GUI
@@ -88,7 +90,7 @@ public class ControlPanelController {
     // Imposta modalità Attivato
     @FXML
     private void activateMode(ActionEvent event) throws Exception {
-        system.setState(new ActiveModeState());
+        system.setState(new AttivoState());
         system.setActiveMode();
         modeLabel.setText("MODALITÀ: ATTIVATO");
         refreshSensorList(); // aggiorna tabella
@@ -97,7 +99,7 @@ public class ControlPanelController {
     // Imposta modalità Collaudo
     @FXML
     private void testMode(ActionEvent event) throws Exception {
-        system.setState(new TestModeState());
+        system.setState(new CollaudoState());
         system.setCollaudoMode();
         modeLabel.setText("MODALITÀ: COLLAUDO");
         refreshSensorList(); // aggiorna tabella

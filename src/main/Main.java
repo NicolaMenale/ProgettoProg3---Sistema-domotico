@@ -1,8 +1,11 @@
 package main;
 
 import java.util.*;
+
 import data.*;
-import model.Sensor;
+import models.*;
+import state.AttivoState;
+import state.CollaudoState;
 
 // ==============================
 // CLASSE PRINCIPALE: Main
@@ -70,7 +73,7 @@ public class Main {
     private static void testMode(HomeSystem system) {
 
         // Imposta lo stato corrente su TestMode
-        system.setState(new TestModeState());
+        system.setState(new CollaudoState());
         system.setCollaudoMode();
 
         boolean back = false;
@@ -362,7 +365,7 @@ public class Main {
     private static void activeMode(HomeSystem system) {
 
         // Imposta lo stato attivo
-        system.setState(new ActiveModeState());
+        system.setState(new AttivoState());
         system.setActiveMode();
 
         boolean back = false;

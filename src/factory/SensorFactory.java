@@ -1,6 +1,6 @@
 package factory;
 
-import model.Sensor;
+import models.*;
 
 // ==============================
 // CLASSE ASTRATTA: FACTORY SENSOR

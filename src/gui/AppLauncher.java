@@ -6,10 +6,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import main.HomeSystem;
-import main.TestModeState;
-import data.FileManager;
-import model.Sensor;
+import models.*;
+import state.CollaudoState;
+
 import java.util.List;
+
+import data.FileManager;
 
 // ==============================
 // LAUNCHER APPLICAZIONE GUI
@@ -41,7 +43,7 @@ public class AppLauncher extends Application {
         });
 
         // Imposta stato iniziale in modalità Collaudo
-        system.setState(new TestModeState());
+        system.setState(new CollaudoState());
 
         // Caricamento sensori dal file
         List<Sensor> sensors = FileManager.loadSensors();

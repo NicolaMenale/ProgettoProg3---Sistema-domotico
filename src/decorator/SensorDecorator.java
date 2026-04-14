@@ -1,7 +1,8 @@
 package decorator;
 
-import model.Sensor;
 import java.util.*;
+
+import models.*;
 
 // ==============================
 // DECORATOR ASTRACT PER SENSORI

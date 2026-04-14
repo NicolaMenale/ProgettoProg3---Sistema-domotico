@@ -1,6 +1,6 @@
 package factory;
 
-import model.*;
+import models.*;
 
 // ==============================
 // FACTORY PER SENSORI DI INTERVENTO

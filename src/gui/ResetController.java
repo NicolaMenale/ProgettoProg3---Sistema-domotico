@@ -5,11 +5,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import main.HomeSystem;
-import data.FileManager;
-import model.Sensor;
+import models.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import data.FileManager;
 
 // ==============================
 // CONTROLLER: RESET SENSORI
