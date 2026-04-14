@@ -14,10 +14,11 @@ import models.*;
 // =============================
 // SISTEMA DOMOTICO PRINCIPALE
 // =============================
-//
-// Gestisce sensori, coppie monitor/intervento, modalità e allarmi.
-// Si occupa anche dell’interfaccia tra Factory e Decorator.
-//
+
+/**
+ * Gestisce sensori, coppie monitor/intervento, modalità e allarmi.
+ * Si occupa anche dell’interfaccia tra Factory e Decorator.
+ */
 public class HomeSystem {
 
     private List<Sensor> sensors = new ArrayList<>(); // tutti i sensori installati
@@ -61,7 +62,9 @@ public class HomeSystem {
         currentState.installSensorsS(this);
     }
 
-    // Installa una coppia monitor/intervento con threshold
+    /**
+     * Installa una coppia monitor/intervento con threshold
+     */
     public void installMonitoringPair(String monitorType, String interventionType, int threshold) {
 
         // Crea il sensore di monitoraggio tramite factory
@@ -82,7 +85,9 @@ public class HomeSystem {
         System.out.println("Coppia installata: " + monitorSensor.getId() + " ↔ " + interventionSensor.getId());
     }
 
-    // Aggiunge una coppia monitor/intervento alla mappa interna
+    /**
+     * Aggiunge una coppia monitor/intervento alla mappa interna
+     */
     public void addMonitoringPair(Sensor monitor, Sensor intervention) {
 
         // Controllo se il monitor è già associato
@@ -99,7 +104,9 @@ public class HomeSystem {
         monitoringToIntervention.put(monitor, intervention);
     }
 
-    // Conta quanti sensori di un certo tipo sono presenti
+    /**
+     * Conta quanti sensori di un certo tipo sono presenti
+     */
     public long countSensorsByType(String prefix) {
         return sensors.stream().filter(s -> s.getId().startsWith(prefix)).count();
     }
@@ -108,12 +115,16 @@ public class HomeSystem {
     // MOSTRA SENSORI INSTALLATI
     // =========================
 
-    // Chiama lo stato corrente per mostrare i sensori (delegazione allo State)
+    /**
+     * Chiama lo stato corrente per mostrare i sensori (delegazione allo State)
+     */
     public void showSensorsS() {
         currentState.showSensors(this);
     }
 
-    // Stampa direttamente i sensori installati
+    /**
+     * Stampa direttamente i sensori installati
+     */
     public void showSensors() {
         if (sensors.isEmpty()) {
             System.out.println("Nessun sensore installato.");
@@ -169,12 +180,16 @@ public class HomeSystem {
     // RESET SENSORI
     // =========================
 
-    // Chiama lo stato corrente per gestire reset sensore singolo
+    /**
+     * Chiama lo stato corrente per gestire reset sensore singolo
+     */
     public void resetSensorByIdS() {
         currentState.resetSensorByIdS(this);
     }
 
-    // Reset di coppia di sensori tramite ID
+    /**
+     * Reset di coppia di sensori tramite ID
+     */
     public boolean resetSensorById(String id) {
         for (int j = 0; j < sensors.size(); j++) {
             Sensor s = getBaseSensor(sensors.get(j)); // ottieni sensore base
@@ -198,12 +213,16 @@ public class HomeSystem {
         return false; // sensore non trovato
     }
 
-    // Chiama lo stato corrente per gestire reset di tutti i sensori
+    /**
+     * Chiama lo stato corrente per gestire reset di tutti i sensori
+     */
     public void resetSensorsS() {
         currentState.resetSensorsS(this);
     }
 
-    // Reset diretto di tutti i sensori (base + decorator)
+    /**
+     * Reset diretto di tutti i sensori (base + decorator)
+     */
     public void resetSensors(HomeSystem system) {
         system.getSensors().forEach(Sensor::reset);
     }
@@ -212,12 +231,16 @@ public class HomeSystem {
     // AGGIUNTA MODULI A SENSORI
     // =========================
 
-    // Delegazione allo stato corrente per eventuali controlli o permessi
+    /**
+     * Delegazione allo stato corrente per eventuali controlli o permessi
+     */
     public void installModules() {
         currentState.installModules(this);
     }
 
-    // Aggiunge un modulo decoratore a un sensore identificato da ID
+    /**
+     * Aggiunge un modulo decoratore a un sensore identificato da ID
+     */
     public boolean addModuleToSensor(String sensorId, String moduleName) {
         int index = -1;
         Sensor selectedSensor = null;
@@ -252,12 +275,16 @@ public class HomeSystem {
     // MOSTRA STATISTICHE SENSORI
     // =========================
 
-    // Delegazione allo stato corrente
+    /**
+     * Delegazione allo stato corrente
+     */
     public void showStatisticsS() {
         currentState.showStatisticsS(this);
     }
 
-    // Stampa direttamente le statistiche di tutti i sensori (base + moduli)
+    /**
+     * Stampa direttamente le statistiche di tutti i sensori (base + moduli)
+     */
     public void showStatistics() {
         if (sensors.isEmpty()) {
             System.out.println("Nessun sensore installato.");
@@ -279,7 +306,9 @@ public class HomeSystem {
     // MODALITÀ ATTIVATO
     // =========================
 
-    // Imposta lo stato del sistema in modalità "Attivato"
+    /**
+     * Imposta lo stato del sistema in modalità "Attivato"
+     */
     public void setActiveMode() {
         System.out.println("Modalità Attivato: tutti i sensori di monitoraggio attivi.");
 
@@ -330,12 +359,16 @@ public class HomeSystem {
     // SIMULAZIONE MONITORAGGIO / INTERVENTI
     // =========================
 
-    // Inoltra la chiamata alla modalità corrente
+    /**
+     * Inoltra la chiamata alla modalità corrente
+     */
     public void simulateSensorCycleS() {
         currentState.simulateSensorCycleS(this);
     }
 
-    // Simula un ciclo di letture dei sensori
+    /**
+     * Simula un ciclo di letture dei sensori
+     */
     public List<String> simulateSensorCycle() {
         List<String> logs = new ArrayList<>();
 
@@ -386,26 +419,34 @@ public class HomeSystem {
         return logs;
     }
 
-    // Restituisce gli allarmi attivi
+    /**
+     * Restituisce gli allarmi attivi
+     */
     public List<Sensor> getAlarmQueue() {
         return new ArrayList<>(currentAlarms);
     }
 
-    // Inserisce un sensore nella coda degli allarmi attivi
+    /**
+     * Inserisce un sensore nella coda degli allarmi attivi
+     */
     public void enqueueAlarm(Sensor monitor) {
         if (!alarmQueue.contains(monitor) && !stopAlarmQueue.contains(monitor)) {
             alarmQueue.add(monitor);
         }
     }
 
-    // Inserisce un sensore nella coda degli allarmi cessati
+    /**
+     * Inserisce un sensore nella coda degli allarmi cessati
+     */
     public void enqueueStopAlarm(Sensor monitor) {
         if (!stopAlarmQueue.contains(monitor)) {
             stopAlarmQueue.add(monitor);
         }
     }
 
-    // Processa gli allarmi attivi in ordine temporale
+    /**
+     * Processa gli allarmi attivi in ordine temporale
+     */
     public void processAlarms() {
         List<Sensor> sortedAlarms = new ArrayList<>(alarmQueue);
         sortedAlarms.sort(Comparator.comparing(s -> ((MonitoringSensor) getBaseSensor(s)).getLastAlarmTime()));
@@ -425,7 +466,9 @@ public class HomeSystem {
         }
     }
 
-    // Processa gli allarmi cessati
+    /**
+     * Processa gli allarmi cessati
+     */
     public void processStopAlarms() {
         List<Sensor> sortedStops = new ArrayList<>(stopAlarmQueue);
         sortedStops.sort(Comparator.comparing(s -> ((MonitoringSensor) getBaseSensor(s)).getLastAlarmTime()));
@@ -447,7 +490,9 @@ public class HomeSystem {
         stopAlarmQueue.clear();
     }
 
-    // Svuota completamente le code di allarme
+    /**
+     * Svuota completamente le code di allarme
+     */
     public void clearAlarmQueues() {
         alarmQueue.clear();
         stopAlarmQueue.clear();
@@ -458,12 +503,16 @@ public class HomeSystem {
     // METODI HELPER
     // =========================
 
-    // Imposta la lista dei sensori (usato ad esempio al caricamento da file)
+    /**
+     * Imposta la lista dei sensori (usato ad esempio al caricamento da file)
+     */
     public void setSensors(List<Sensor> sensors) {
         this.sensors = sensors;
     }
 
-    // Ricostruisce le coppie monitoraggio ↔ intervento dopo un caricamento da file
+    /**
+     * Ricostruisce le coppie monitoraggio ↔ intervento dopo un caricamento da file
+     */
     public void rebuildMonitoringPairs() {
         List<Sensor> monitoringSensors = new ArrayList<>();
         List<Sensor> interventionSensors = new ArrayList<>();
@@ -484,7 +533,9 @@ public class HomeSystem {
         }
     }
 
-    // Restituisce info sintetiche dei sensori per la GUI o log
+    /**
+     * Restituisce info sintetiche dei sensori per la GUI o log
+     */
     public List<String> getSensorInfo() {
         List<String> info = new ArrayList<>();
         for (Sensor s : sensors) {
@@ -495,7 +546,9 @@ public class HomeSystem {
         return info;
     }
 
-    // Restituisce il sensore base, "sgrossando" eventuali decorator
+    /**
+     * Restituisce il sensore base, "sgrossando" eventuali decorator
+     */
     public Sensor getBaseSensor(Sensor sensor) {
         Sensor base = sensor;
         while (base instanceof SensorDecorator decorator) {
@@ -504,14 +557,18 @@ public class HomeSystem {
         return base;
     }
 
-    // Restituisce l’ID del sensore dato un indice nella lista interna
+    /**
+     * Restituisce l’ID del sensore dato un indice nella lista interna
+     */
     public String getSensorIdByIndex(int index) {
         if (index < 0 || index >= sensors.size())
             return null;
         return getBaseSensor(sensors.get(index)).getId();
     }
 
-    // Restituisce i moduli disponibili per un sensore (usato dalla GUI Decorate)
+    /**
+     * Restituisce i moduli disponibili per un sensore (usato dalla GUI Decorate)
+     */
     public List<String> getAvailableModules(String sensorId) {
         Sensor sensor = sensors.stream()
                 .filter(s -> getBaseSensor(s).getId().equals(sensorId))
@@ -525,7 +582,9 @@ public class HomeSystem {
         return ModuleRegistry.getAvailableModules(sensor);
     }
 
-    // Restituisce la lista completa dei sensori
+    /**
+     * Restituisce la lista completa dei sensori
+     */
     public List<Sensor> getSensors() {
         return sensors;
     }

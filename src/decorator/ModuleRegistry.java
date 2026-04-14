@@ -89,8 +89,10 @@ public class ModuleRegistry {
     // METODI PUBBLICI
     // ==============================
 
-    // Restituisce la lista dei moduli disponibili per un sensore
-    // Esclude quelli già installati
+    /**
+     * Restituisce la lista dei moduli disponibili per un sensore
+     * Esclude quelli già installati
+     */
     public static List<String> getAvailableModules(Sensor sensor) {
         // ottiene il sensore base senza decoratori
         Sensor baseSensor = getBaseSensor(sensor);
@@ -105,7 +107,9 @@ public class ModuleRegistry {
         return available;
     }
 
-    // Crea un modulo decoratore a partire dal nome del modulo
+    /**
+     * Crea un modulo decoratore a partire dal nome del modulo
+     */
     public static Sensor createModule(String moduleName, Sensor sensor) {
         Function<Sensor, Sensor> creator = MODULE_CREATORS.get(moduleName);
         if (creator == null) // modulo non trovato
@@ -118,7 +122,9 @@ public class ModuleRegistry {
     // METODI PRIVATI / HELPERS
     // ==============================
 
-    // Restituisce il sensore base senza i decoratori
+    /**
+     * Restituisce il sensore base senza i decoratori
+     */
     private static Sensor getBaseSensor(Sensor sensor) {
         Sensor current = sensor;
 
@@ -130,7 +136,9 @@ public class ModuleRegistry {
         return current;
     }
 
-    // Restituisce la lista dei moduli installati su un sensore
+    /**
+     * Restituisce la lista dei moduli installati su un sensore
+     */
     public static List<String> getInstalledModules(Sensor sensor) {
         if (sensor instanceof SensorDecorator sd) {
             return sd.getModules(); // prende i moduli dal decoratore

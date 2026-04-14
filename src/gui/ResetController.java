@@ -36,13 +36,17 @@ public class ResetController {
     // SETTER / INIZIALIZZAZIONE
     // ==============================
 
-    // Imposta il sistema domotico e popola la ComboBox dei sensori
+    /**
+     * Imposta il sistema domotico e popola la ComboBox dei sensori
+     */
     public void setSystem(HomeSystem system) {
         this.system = system;
         populateSensorComboBox();
     }
 
-    // Imposta il controller principale della GUI
+    /**
+     * Imposta il controller principale della GUI
+     */
     public void setMainController(ControlPanelController controller) {
         this.mainController = controller;
     }

@@ -37,19 +37,25 @@ public abstract class SensorDecorator extends Sensor {
     // GETTER MODULI
     // ==============================
 
-    // Restituisce il nome del modulo corrente (ultimo aggiunto)
+    /**
+     * Restituisce il nome del modulo corrente (ultimo aggiunto)
+     */
     public String getModuleName() {
         if (modules.isEmpty())
             return "Decoratore generico";
         return modules.get(modules.size() - 1);
     }
 
-    // Restituisce il sensore decorato
+    /**
+     * Restituisce il sensore decorato
+     */
     public Sensor getWrappedSensor() {
         return wrappedSensor;
     }
 
-    // Restituisce tutti i moduli installati, incluso questo decoratore
+    /**
+     * Restituisce tutti i moduli installati, incluso questo decoratore
+     */
     public List<String> getModules() {
         List<String> modules = new ArrayList<>();
         if (wrappedSensor instanceof SensorDecorator decorator) {

@@ -14,7 +14,10 @@ public class InterventionSensorFactory extends SensorFactory {
     // ==============================
     // IMPLEMENTAZIONE FACTORY METHOD
     // ==============================
-    // Crea un sensore di intervento a partire dall'ID
+
+    /**
+     * Crea un sensore di intervento a partire dall'ID
+     */
     @Override
     protected Sensor instantiateSensor(String id) {
 

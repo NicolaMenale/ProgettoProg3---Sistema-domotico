@@ -6,15 +6,14 @@ import java.util.*;
 
 import decorator.*;
 import models.*;
-
 // ==============================
 // GESTIONE SALVATAGGIO / CARICAMENTO FILE
-// ==============================
-//
-// Gestisce lettura e scrittura di:
-//   - sensori e decoratori
-//   - statistiche dei sensori
-//
+//==============================
+/**
+ * Gestisce lettura e scrittura di:
+ * - sensori e decoratori
+ * - statistiche dei sensori
+ */
 public class FileManager {
 
     private static final String SENSOR_FILE = "src/data/sensors.txt"; // file dei sensori
@@ -23,6 +22,14 @@ public class FileManager {
     // ==============================
     // SALVATAGGIO SENSORI
     // ==============================
+    /**
+     * Salva la lista dei sensori su file.
+     *
+     * Per ogni sensore viene salvato:
+     * - tipo (monitoring/intervention)
+     * - configurazione base
+     * - eventuali moduli applicati (Decorator)
+     */
     public static void saveSensors(List<Sensor> sensors) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(SENSOR_FILE))) {
 
@@ -78,6 +85,10 @@ public class FileManager {
     // ==============================
     // CARICAMENTO SENSORI
     // ==============================
+     /**
+     * Carica i sensori da file.
+     * Ricostruisce anche i moduli applicati utilizzando il pattern Decorator.
+     */
     public static List<Sensor> loadSensors() {
         List<Sensor> sensors = new ArrayList<>();
         File file = new File(SENSOR_FILE);
@@ -135,6 +146,10 @@ public class FileManager {
     // ==============================
     // SALVATAGGIO STATISTICHE
     // ==============================
+    /**
+     * Salva le statistiche dei sensori su file.
+     * Include stato, letture, conteggi e storico eventi.
+     */
     public static void saveStatistics(List<Sensor> sensors) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(STAT_FILE))) {
 
@@ -168,6 +183,9 @@ public class FileManager {
     // ==============================
     // CARICAMENTO STATISTICHE
     // ==============================
+    /**
+     * Carica le statistiche dai file e le associa ai sensori esistenti.
+     */
     public static void loadStatistics(List<Sensor> sensors) {
         File file = new File(STAT_FILE);
         if (!file.exists())
@@ -229,6 +247,10 @@ public class FileManager {
     // ==============================
     // CANCELLA TUTTI I FILE DI DATI
     // ==============================
+    /**
+     * Cancella il contenuto dei file di dati presenti nella cartella /data.
+     * I file vengono svuotati ma non eliminati.
+     */
     public static void clearDataFiles() {
         File folder = new File(System.getProperty("user.dir") + "/data");
         if (!folder.exists() || !folder.isDirectory())

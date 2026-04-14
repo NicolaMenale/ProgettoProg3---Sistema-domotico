@@ -76,7 +76,9 @@ public class ControlPanelController {
     // SET SYSTEM
     // ==============================
 
-    // Imposta il sistema domotico principale e prepara la tabella sensori
+    /**
+     * Imposta il sistema domotico principale e prepara la tabella sensori
+     */
     public void setSystem(HomeSystem system) {
         this.system = system;
         setupTable();
@@ -87,7 +89,9 @@ public class ControlPanelController {
     // CAMBIO MODALITÀ
     // ==============================
 
-    // Imposta modalità Attivato
+    /**
+     * Imposta modalità Attivato
+     */
     @FXML
     private void activateMode(ActionEvent event) throws Exception {
         system.setState(new AttivoState());
@@ -96,7 +100,9 @@ public class ControlPanelController {
         refreshSensorList(); // aggiorna tabella
     }
 
-    // Imposta modalità Collaudo
+    /**
+     * Imposta modalità Collaudo
+     */
     @FXML
     private void testMode(ActionEvent event) throws Exception {
         system.setState(new CollaudoState());
@@ -109,7 +115,9 @@ public class ControlPanelController {
     // AGGIORNAMENTO TABELLA SENSORI
     // ==============================
 
-    // Aggiorna lista dei sensori nella tabella
+    /**
+     * Aggiorna lista dei sensori nella tabella
+     */
     public void refreshSensorList() {
         if (system == null)
             return;
@@ -118,7 +126,9 @@ public class ControlPanelController {
         statsTableView.refresh();
     }
 
-    // Imposta le colonne della tabella sensori
+    /**
+     * Imposta le colonne della tabella sensori
+     */
     private void setupTable() {
         // Colonna ID sensore
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -204,7 +214,9 @@ public class ControlPanelController {
     // FINSTRE SECONDARIE
     // ==============================
 
-    // Apre finestra per installare coppia di sensori
+    /**
+     * Apre finestra per installare coppia di sensori
+     */
     @FXML
     private void openInstallPairWindow() throws IOException {
         try {
@@ -229,7 +241,9 @@ public class ControlPanelController {
         }
     }
 
-    // Apre finestra reset sensori
+    /**
+     * Apre finestra reset sensori
+     */
     @FXML
     private void openResetWindow() throws IOException {
         try {
@@ -254,7 +268,9 @@ public class ControlPanelController {
         }
     }
 
-    // Apre finestra decorazione sensore
+    /**
+     * Apre finestra decorazione sensore
+     */
     @FXML
     private void openDecorateWindow() throws IOException {
         try {
@@ -324,7 +340,9 @@ public class ControlPanelController {
     // HELPER
     // ==============================
 
-    // Ottiene il sensore base senza decorator
+    /**
+     * Ottiene il sensore base senza decorator
+     */
     private Sensor getBaseSensor(Sensor s) {
         Sensor current = s;
         while (current instanceof SensorDecorator dec) {
@@ -337,7 +355,9 @@ public class ControlPanelController {
     // LOG GENERALE
     // ==============================
 
-    // Scrive messaggi nell'area log
+    /**
+     * Scrive messaggi nell'area log
+     */
     public void addLog(String message) {
         logArea.appendText(message + "\n");
         logArea.setScrollTop(Double.MAX_VALUE);

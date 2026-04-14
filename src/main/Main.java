@@ -4,17 +4,17 @@ import java.util.*;
 
 import data.*;
 import models.*;
-import state.AttivoState;
-import state.CollaudoState;
+import state.*;
 
 // ==============================
 // CLASSE PRINCIPALE: Main
 // ==============================
-//
-// Entry point del sistema domotico.
-// Gestisce modalità terminale, caricamento/salvataggio sensori e statistiche,
-// e l’interazione con l’utente tramite Scanner.
-// 
+
+/**
+ * Entry point del sistema domotico.
+ * Gestisce modalità terminale, caricamento/salvataggio sensori e statistiche,
+ * e l’interazione con l’utente tramite Scanner.
+ */
 public class Main {
 
     // Scanner per input da terminale

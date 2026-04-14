@@ -42,12 +42,16 @@ public class InstallPairController {
     // SETTER
     // ==============================
 
-    // Imposta il controller principale della GUI
+    /**
+     * Imposta il controller principale della GUI
+     */
     public void setMainController(ControlPanelController controller) {
         this.mainController = controller;
     }
 
-    // Imposta il sistema domotico principale
+    /**
+     * Imposta il sistema domotico principale
+     */
     public void setSystem(HomeSystem system) {
         this.system = system;
     }
@@ -56,7 +60,9 @@ public class InstallPairController {
     // INIZIALIZZAZIONE DELLA GUI
     // ==============================
 
-    // Popola la ComboBox con le coppie monitoraggio → intervento
+    /**
+     * Popola la ComboBox con le coppie monitoraggio → intervento
+     */
     @FXML
     public void initialize() {
         for (int i = 0; i < monitorTypes.length; i++) {

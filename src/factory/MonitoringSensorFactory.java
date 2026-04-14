@@ -28,7 +28,10 @@ public class MonitoringSensorFactory extends SensorFactory {
     // ==============================
     // IMPLEMENTAZIONE FACTORY METHOD
     // ==============================
-    // Crea un sensore di monitoraggio a partire dall'ID
+
+    /**
+     * Crea un sensore di monitoraggio a partire dall'ID
+     */
     @Override
     protected Sensor instantiateSensor(String id) {
 

@@ -32,13 +32,17 @@ public class DecorateSensorController {
     // SETTER
     // ==============================
 
-    // Imposta il sistema domotico principale e carica i sensori nella ComboBox
+    /**
+     * Imposta il sistema domotico principale e carica i sensori nella ComboBox
+     */
     public void setSystem(HomeSystem system) {
         this.system = system;
         loadSensors();
     }
 
-    // Imposta il controller principale della GUI
+    /**
+     * Imposta il controller principale della GUI
+     */
     public void setMainController(ControlPanelController controller) {
         this.mainController = controller;
     }
@@ -47,7 +51,9 @@ public class DecorateSensorController {
     // CARICAMENTO SENSORI
     // ==============================
 
-    // Popola la ComboBox con i sensori presenti nel sistema
+    /**
+     * Popola la ComboBox con i sensori presenti nel sistema
+     */
     private void loadSensors() {
         sensorComboBox.getItems().clear(); // pulisce eventuali valori precedenti
         sensorComboBox.getItems().addAll(system.getSensorInfo()); // aggiunge info sensori
@@ -60,7 +66,9 @@ public class DecorateSensorController {
     // CARICAMENTO MODULI DISPONIBILI
     // ==============================
 
-    // Aggiorna la ListView con i moduli disponibili per il sensore selezionato
+    /**
+     * Aggiorna la ListView con i moduli disponibili per il sensore selezionato
+     */
     private void loadModules() {
         String sensorInfo = sensorComboBox.getValue(); // ottiene info del sensore selezionato
         if (sensorInfo == null)
@@ -78,7 +86,9 @@ public class DecorateSensorController {
     // AGGIUNTA MODULO
     // ==============================
 
-    // Aggiunge il modulo selezionato al sensore selezionato
+    /**
+     * Aggiunge il modulo selezionato al sensore selezionato
+     */
     @FXML
     private void addModule() {
 
@@ -104,7 +114,9 @@ public class DecorateSensorController {
     // CHIUSURA FINESTRA
     // ==============================
 
-    // Chiude la finestra corrente
+    /**
+     * Chiude la finestra corrente
+     */
     @FXML
     private void closeWindow() {
         Stage stage = (Stage) sensorComboBox.getScene().getWindow();
