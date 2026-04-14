@@ -205,61 +205,73 @@ public class ControlPanelController {
     // Apre finestra per installare coppia di sensori
     @FXML
     private void openInstallPairWindow() throws IOException {
-        system.installSensors(); // verifica permessi stato
+        try {
+            system.installSensorsS(); // verifica permessi stato
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("InstallPairView.fxml"));
-        Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("InstallPairView.fxml"));
+            Parent root = loader.load();
 
-        InstallPairController controller = loader.getController();
-        controller.setSystem(system);
-        controller.setMainController(this);
+            InstallPairController controller = loader.getController();
+            controller.setSystem(system);
+            controller.setMainController(this);
 
-        Stage stage = new Stage();
-        stage.setTitle("Aggiungi coppia di sensori");
-        stage.setScene(new Scene(root));
-        stage.initModality(Modality.APPLICATION_MODAL); // blocca main panel
-        stage.showAndWait(); // attende chiusura finestra
+            Stage stage = new Stage();
+            stage.setTitle("Aggiungi coppia di sensori");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL); // blocca main panel
+            stage.showAndWait(); // attende chiusura finestra
 
-        refreshSensorList(); // aggiorna tabella dopo chiusura
+            refreshSensorList(); // aggiorna tabella dopo chiusura
+        } catch (IllegalStateException e) {
+            logArea.appendText(e.getMessage() + "\n");
+        }
     }
 
     // Apre finestra reset sensori
     @FXML
     private void openResetWindow() throws IOException {
-        system.resetSensorsS(); // verifica permessi stato
+        try {
+            system.resetSensorsS(); // verifica permessi stato
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("ResetView.fxml"));
-        Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ResetView.fxml"));
+            Parent root = loader.load();
 
-        ResetController controller = loader.getController();
-        controller.setSystem(system);
-        controller.setMainController(this);
+            ResetController controller = loader.getController();
+            controller.setSystem(system);
+            controller.setMainController(this);
 
-        Stage stage = new Stage();
-        stage.setTitle("Reset Sensori");
-        stage.setScene(new Scene(root));
-        stage.initModality(Modality.APPLICATION_MODAL); // blocca main panel
-        stage.showAndWait();
+            Stage stage = new Stage();
+            stage.setTitle("Reset Sensori");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL); // blocca main panel
+            stage.showAndWait();
 
-        refreshSensorList(); // aggiorna tabella dopo chiusura
+            refreshSensorList(); // aggiorna tabella dopo chiusura
+        } catch (IllegalStateException e) {
+            logArea.appendText(e.getMessage() + "\n");
+        }
     }
 
     // Apre finestra decorazione sensore
     @FXML
     private void openDecorateWindow() throws IOException {
-        system.installModules(); // verifica permessi stato
+        try {
+            system.installModules(); // verifica permessi stato
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("DecorateSensorView.fxml"));
-        Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("DecorateSensorView.fxml"));
+            Parent root = loader.load();
 
-        DecorateSensorController controller = loader.getController();
-        controller.setSystem(system);
-        controller.setMainController(this);
+            DecorateSensorController controller = loader.getController();
+            controller.setSystem(system);
+            controller.setMainController(this);
 
-        Stage stage = new Stage();
-        stage.setTitle("Aggiungi Moduli Sensore");
-        stage.setScene(new Scene(root));
-        stage.show();
+            Stage stage = new Stage();
+            stage.setTitle("Aggiungi Moduli Sensore");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IllegalStateException e) {
+            logArea.appendText(e.getMessage() + "\n");
+        }
     }
 
     // ==============================
@@ -268,14 +280,18 @@ public class ControlPanelController {
 
     @FXML
     private void simulateCycle() {
-        system.simulateSensorCycleS(); // verifica stato
+        try {
+            system.simulateSensorCycleS(); // verifica stato
 
-        List<String> logs = system.simulateSensorCycle(); // esegue ciclo sensori
-        alarmQueue(); // aggiorna lista allarmi attivi
-        for (String log : logs) {
-            addLog(log); // scrive log eventi
+            List<String> logs = system.simulateSensorCycle(); // esegue ciclo sensori
+            alarmQueue(); // aggiorna lista allarmi attivi
+            for (String log : logs) {
+                addLog(log); // scrive log eventi
+            }
+            refreshSensorList(); // aggiorna tabella
+        } catch (IllegalStateException e) {
+            logArea.appendText(e.getMessage() + "\n");
         }
-        refreshSensorList(); // aggiorna tabella
     }
 
     // ==============================
@@ -284,17 +300,21 @@ public class ControlPanelController {
 
     @FXML
     public void alarmQueue() {
-        alarmQueueArea.clear();
+        try {
+            alarmQueueArea.clear();
 
-        // Scorri tutti i sensori del sistema
-        for (Sensor s : system.getSensors()) {
-            Sensor base = getBaseSensor(s);
+            // Scorri tutti i sensori del sistema
+            for (Sensor s : system.getSensors()) {
+                Sensor base = getBaseSensor(s);
 
-            // Solo MonitoringSensor attivi
-            if (base instanceof MonitoringSensor ms && ms.isActive()) {
-                String line = ms.getId() + " - Ultimo allarme: " + ms.getLastAlarmTime();
-                alarmQueueArea.appendText(line + "\n");
+                // Solo MonitoringSensor attivi
+                if (base instanceof MonitoringSensor ms && ms.isActive()) {
+                    String line = ms.getId() + " - Ultimo allarme: " + ms.getLastAlarmTime();
+                    alarmQueueArea.appendText(line + "\n");
+                }
             }
+        } catch (IllegalStateException e) {
+            logArea.appendText(e.getMessage() + "\n");
         }
     }
 

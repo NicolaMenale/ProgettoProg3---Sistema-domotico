@@ -32,15 +32,12 @@ public class FileManager {
 
                 // sensore di monitoraggio
                 if (base instanceof MonitoringSensor ms) {
-                    line.append(ms.getId())
-                            .append(";MONITORING;")
-                            .append(ms.getThreshold());
+                    line.append(ms.getId()).append(";MONITORING;").append(ms.getThreshold());
                 }
 
                 // sensore di intervento
                 else if (base instanceof InterventionSensor is) {
-                    line.append(is.getId())
-                            .append(";INTERVENTION");
+                    line.append(is.getId()).append(";INTERVENTION");
                 }
 
                 // salva i decoratori / moduli
@@ -150,24 +147,19 @@ public class FileManager {
                             .append(";MONITORING;")
                             .append(ms.isActive() ? "SI" : "NO").append(";")
                             .append(ms.getThreshold()).append(";")
-                            .append(String.join(",", ms.getReadings().stream()
-                                    .map(String::valueOf).toList()))
+                            .append(String.join(",", ms.getReadings().stream().map(String::valueOf).toList()))
                             .append(";")
                             .append(ms.getAlarmCount()).append(";")
-                            .append(String.join(",", ms.getAlarmHistory().stream()
-                                    .map(Object::toString).toList()));
+                            .append(String.join(",", ms.getAlarmHistory().stream().map(Object::toString).toList()));
                 } else if (base instanceof InterventionSensor is) {
                     line.append(is.getId())
                             .append(";INTERVENTION;")
                             .append(is.isActive() ? "SI" : "NO").append(";")
                             .append(is.getActivationCount()).append(";")
-                            .append(String.join(",", is.getActivationHistory().stream()
-                                    .map(Object::toString).toList()));
+                            .append(String.join(",", is.getActivationHistory().stream().map(Object::toString).toList()));
                 }
-
                 writer.println(line.toString());
             }
-
         } catch (IOException e) {
             System.out.println("Errore salvataggio statistiche.");
         }

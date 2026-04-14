@@ -20,7 +20,7 @@ public abstract class SystemState {
 
     // Installa sensori nel sistema
     // Ogni stato può decidere se permettere o bloccare l'installazione
-    public void installSensors(HomeSystem system) {
+    public void installSensorsS(HomeSystem system) {
         throw new IllegalStateException("Operazione non consentita nello stato corrente");
     }
 
@@ -53,6 +53,4 @@ public abstract class SystemState {
     public void simulateSensorCycleS(HomeSystem system) {
         throw new IllegalStateException("Operazione non consentita nello stato corrente");
     }
-
-    
 }

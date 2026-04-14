@@ -54,8 +54,8 @@ public class HomeSystem {
     // ==============================
 
     // Richiama la logica dello stato corrente
-    public void installSensors() {
-        currentState.installSensors(this);
+    public void installSensorsS() {
+        currentState.installSensorsS(this);
     }
 
     // Installa una coppia monitor/intervento con threshold
@@ -63,13 +63,11 @@ public class HomeSystem {
 
         // Crea il sensore di monitoraggio tramite factory
         SensorFactory monitorFactory = SensorFactoryProvider.getFactory(monitorType, threshold);
-        Sensor monitorSensor = monitorFactory.createSensor(monitorType + (countSensorsByType(monitorType) + 1)); // ID
-                                                                                                                 // progressivo
+        Sensor monitorSensor = monitorFactory.createSensor(monitorType + (countSensorsByType(monitorType) + 1)); // ID progressivo
 
         // Crea il sensore di intervento tramite factory
         SensorFactory interventionFactory = SensorFactoryProvider.getFactory(interventionType);
-        Sensor interventionSensor = interventionFactory
-                .createSensor(interventionType + (countSensorsByType(interventionType) + 1)); // ID progressivo
+        Sensor interventionSensor = interventionFactory.createSensor(interventionType + (countSensorsByType(interventionType) + 1)); // ID progressivo
 
         // Aggiunge i sensori alla lista del sistema
         sensors.add(monitorSensor);
@@ -336,7 +334,6 @@ public class HomeSystem {
 
     // Simula un ciclo di letture dei sensori
     public List<String> simulateSensorCycle() {
-        simulateSensorCycleS(); // richiama lo stato corrente
         List<String> logs = new ArrayList<>();
 
         // Mischia la lista dei sensori per simulazione casuale

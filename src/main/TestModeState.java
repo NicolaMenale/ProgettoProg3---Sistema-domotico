@@ -20,8 +20,8 @@ public class TestModeState extends SystemState {
 
     // In modalità test, l’installazione dei sensori va avanti normalmente
     @Override
-    public void installSensors(HomeSystem system){
-        // Nessuna restrizione: HomeSystem gestisce l’installazione
+    public void installSensorsS(HomeSystem system){
+
     }
 
     // =============================

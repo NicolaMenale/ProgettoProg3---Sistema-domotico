@@ -30,7 +30,6 @@ public class ActiveModeState extends SystemState {
     // Simula un ciclo dei sensori (letture, allarmi, interventi)
     @Override
     public void simulateSensorCycleS(HomeSystem system) {
-        // Logica reale gestita da HomeSystem
-        // Questo metodo viene sovrascritto solo per consentire l’invocazione
+        system.simulateSensorCycle();
     }
 }

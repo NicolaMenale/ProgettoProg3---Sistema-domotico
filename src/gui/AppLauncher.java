@@ -34,7 +34,7 @@ public class AppLauncher extends Application {
         // Gestore globale delle eccezioni non catturate
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
             System.out.println("ERRORE FATALE: " + throwable.getMessage());
-            System.out.println("Salvataggio dati prima di terminare...");
+            System.out.println("Salvataggio dati...");
             FileManager.saveSensors(system.getSensors());
             FileManager.saveStatistics(system.getSensors());
             throwable.printStackTrace();
@@ -79,7 +79,7 @@ public class AppLauncher extends Application {
 
         // Gestione chiusura finestra: salva dati
         stage.setOnCloseRequest(event -> {
-            System.out.println("Salvataggio dati prima di uscire...");
+            System.out.println("Salvataggio dati...");
             FileManager.saveSensors(system.getSensors());
             FileManager.saveStatistics(system.getSensors());
         });

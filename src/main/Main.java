@@ -106,7 +106,7 @@ public class Main {
     private static void installSensors(HomeSystem system) {
 
         // Chiede al sistema di iniziare l’installazione (può controllare lo stato e bloccare se non permesso)
-        system.installSensors();
+        system.installSensorsS();
 
         boolean back = false; // flag per uscire dal menu
 
@@ -378,7 +378,7 @@ public class Main {
             int choice = scanner.nextInt();
 
             switch (choice) {
-                case 1 -> system.simulateSensorCycle(); // gestisce letture/allarmi
+                case 1 -> system.simulateSensorCycleS(); // gestisce letture/allarmi
                 case 2 -> system.showSensorsS(); // stampa sensori
                 case 3 -> system.showStatisticsS(); // mostra statistiche
                 case 0 -> back = true;
