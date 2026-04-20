@@ -11,6 +11,18 @@ package factory;
 public class SensorFactoryProvider {
 
     // ==============================
+    // OTTIENI FACTORY CON THRESHOLD SPECIFICO
+    // ==============================
+    public static SensorFactory getFactory(String prefix, int threshold) {
+
+        // Restituisce la factory corrispondente e permette di passare la soglia
+        return switch (prefix) {
+            case "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" -> new MonitoringSensorFactory(threshold);
+            default -> throw new IllegalArgumentException("Nessuna factory per il sensore: " + prefix);
+        };
+    }
+
+    // ==============================
     // OTTIENI FACTORY DA ID SENSOR
     // ==============================
     public static SensorFactory getFactory(String id) {
@@ -20,20 +32,6 @@ public class SensorFactoryProvider {
 
         // Restituisce la factory corrispondente in base al prefisso
         return switch (prefix) {
-            case "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" -> new MonitoringSensorFactory(0); // default threshold 0 se non noto
-            case "AIRCONDITIONER", "POWERCUT", "SIREN", "VENT", "LOCK" -> new InterventionSensorFactory();
-            default -> throw new IllegalArgumentException("Nessuna factory per il sensore: " + prefix);
-        };
-    }
-
-    // ==============================
-    // OTTIENI FACTORY CON THRESHOLD SPECIFICO
-    // ==============================
-    public static SensorFactory getFactory(String prefix, int threshold) {
-
-        // Restituisce la factory corrispondente e permette di passare la soglia
-        return switch (prefix) {
-            case "TEMPERATURE", "ELECTRICITY", "SMOKE", "GAS", "MOVEMENT" -> new MonitoringSensorFactory(threshold);
             case "AIRCONDITIONER", "POWERCUT", "SIREN", "VENT", "LOCK" -> new InterventionSensorFactory();
             default -> throw new IllegalArgumentException("Nessuna factory per il sensore: " + prefix);
         };

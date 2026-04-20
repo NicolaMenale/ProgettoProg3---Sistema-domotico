@@ -1,17 +1,19 @@
 package state;
 
+import java.util.List;
+
 import main.HomeSystem;
 
 // ==============================
 // CLASSE: ACTIVE MODE STATE
 // ==============================
 
-/** 
-* Rappresenta lo stato “ATTIVATO” del sistema domotico.
-* In questa modalità il sistema è pienamente operativo.
-* I sensori sono attivi e alcune operazioni di configurazione
-* (installazione / reset) possono essere bloccate.
-*/ 
+/**
+ * Rappresenta lo stato “ATTIVATO” del sistema domotico.
+ * In questa modalità il sistema è pienamente operativo.
+ * I sensori sono attivi e alcune operazioni di configurazione
+ * (installazione / reset) possono essere bloccate.
+ */
 public class AttivoState extends SystemState {
 
     // ==============================
@@ -30,9 +32,11 @@ public class AttivoState extends SystemState {
         system.showStatistics();
     }
 
-    /** Simula un ciclo di funzionamento dei sensori (letture, allarmi e interventi). */
+    /**
+     * Simula un ciclo di funzionamento dei sensori (letture, allarmi e interventi).
+     */
     @Override
-    public void simulateSensorCycleS(HomeSystem system) {
-        system.simulateSensorCycle();
+    public List<String> simulateSensorCycleS(HomeSystem system) {
+        return system.simulateSensorCycle();
     }
 }

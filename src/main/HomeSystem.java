@@ -23,7 +23,7 @@ public class HomeSystem {
 
     private List<Sensor> sensors = new ArrayList<>(); // tutti i sensori installati
     private Map<Sensor, Sensor> monitoringToIntervention = new HashMap<>(); // mappa monitor -> intervento
-    private SystemState currentState; // stato corrente del sistema (Collaudo, Attivato, ecc.)
+    private SystemState currentState; // stato corrente del sistema (Collaudo, Attivato)
     private Queue<Sensor> alarmQueue = new LinkedList<>(); // coda degli allarmi attivi
     private Queue<Sensor> stopAlarmQueue = new LinkedList<>(); // coda per stop allarmi
     List<Sensor> currentAlarms; // lista degli allarmi correnti
@@ -362,8 +362,8 @@ public class HomeSystem {
     /**
      * Inoltra la chiamata alla modalità corrente
      */
-    public void simulateSensorCycleS() {
-        currentState.simulateSensorCycleS(this);
+    public List<String> simulateSensorCycleS() {
+        return currentState.simulateSensorCycleS(this);
     }
 
     /**

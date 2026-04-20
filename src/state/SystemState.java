@@ -1,5 +1,7 @@
 package state;
 
+import java.util.List;
+
 import main.HomeSystem;
 
 // =============================
@@ -52,7 +54,7 @@ public abstract class SystemState {
     }
 
     /** Simula un ciclo di sensori (letture, allarmi, ecc.) */
-    public void simulateSensorCycleS(HomeSystem system) {
+    public List<String> simulateSensorCycleS(HomeSystem system) {
         throw new IllegalStateException("Operazione non consentita nello stato corrente");
     }
 }

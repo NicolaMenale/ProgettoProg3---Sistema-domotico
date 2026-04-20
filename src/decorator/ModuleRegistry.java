@@ -1,7 +1,6 @@
 package decorator;
 
 import java.util.*;
-import java.util.function.Function;
 
 import models.*;
 import decorator.modules.*;
@@ -24,7 +23,6 @@ public class ModuleRegistry {
 
     // Mappa tra tipo base sensore e lista dei moduli disponibili
     private static final Map<String, List<String>> SENSOR_MODULES = new HashMap<>();
-
     static {
         // Sensori di monitoraggio
         SENSOR_MODULES.put("TEMPERATURE", Arrays.asList("AudioModule", "VideoModule", "NotificationModule",
@@ -60,32 +58,6 @@ public class ModuleRegistry {
     }
 
     // ==============================
-    // FACTORY DEI DECORATOR
-    // ==============================
-
-    // Mappa tra nome modulo e funzione per creare il decoratore
-    private static final Map<String, Function<Sensor, Sensor>> MODULE_CREATORS = new HashMap<>();
-
-    static {
-        // Crea ogni modulo come decoratore su un sensore
-        MODULE_CREATORS.put("AudioModule", s -> new AudioModule(s));
-        MODULE_CREATORS.put("VideoModule", s -> new VideoModule(s));
-        MODULE_CREATORS.put("NotificationModule", s -> new NotificationModule(s));
-        MODULE_CREATORS.put("LoggingModule", s -> new LoggingModule(s));
-        MODULE_CREATORS.put("SensorCalibrationModule", s -> new SensorCalibrationModule(s));
-        MODULE_CREATORS.put("AnalyticsModule", s -> new AnalyticsModule(s));
-        MODULE_CREATORS.put("SmokeDetectionModule", s -> new SmokeDetectionModule(s));
-        MODULE_CREATORS.put("GasLeakModule", s -> new GasLeakModule(s));
-        MODULE_CREATORS.put("RemoteControlModule", s -> new RemoteControlModule(s));
-        MODULE_CREATORS.put("AlarmModule", s -> new AlarmModule(s));
-        MODULE_CREATORS.put("FlowMonitoringModule", s -> new FlowMonitoringModule(s));
-        MODULE_CREATORS.put("VentModule", s -> new VentModule(s));
-        MODULE_CREATORS.put("LockModule", s -> new LockModule(s));
-        MODULE_CREATORS.put("PowerCalibrationModule", s -> new PowerCalibrationModule(s));
-        MODULE_CREATORS.put("PowerModule", s -> new PowerModule(s));
-    }
-
-    // ==============================
     // METODI PUBBLICI
     // ==============================
 
@@ -107,15 +79,46 @@ public class ModuleRegistry {
         return available;
     }
 
+    // ==============================
+    // FACTORY DEI DECORATOR
+    // ==============================
     /**
      * Crea un modulo decoratore a partire dal nome del modulo
      */
     public static Sensor createModule(String moduleName, Sensor sensor) {
-        Function<Sensor, Sensor> creator = MODULE_CREATORS.get(moduleName);
-        if (creator == null) // modulo non trovato
+        if (moduleName.equals("AudioModule")) {
+            return new AudioModule(sensor);
+        } else if (moduleName.equals("VideoModule")) {
+            return new VideoModule(sensor);
+        } else if (moduleName.equals("NotificationModule")) {
+            return new NotificationModule(sensor);
+        } else if (moduleName.equals("LoggingModule")) {
+            return new LoggingModule(sensor);
+        } else if (moduleName.equals("SensorCalibrationModule")) {
+            return new SensorCalibrationModule(sensor);
+        } else if (moduleName.equals("AnalyticsModule")) {
+            return new AnalyticsModule(sensor);
+        } else if (moduleName.equals("SmokeDetectionModule")) {
+            return new SmokeDetectionModule(sensor);
+        } else if (moduleName.equals("GasLeakModule")) {
+            return new GasLeakModule(sensor);
+        } else if (moduleName.equals("RemoteControlModule")) {
+            return new RemoteControlModule(sensor);
+        } else if (moduleName.equals("AlarmModule")) {
+            return new AlarmModule(sensor);
+        } else if (moduleName.equals("FlowMonitoringModule")) {
+            return new FlowMonitoringModule(sensor);
+        } else if (moduleName.equals("VentModule")) {
+            return new VentModule(sensor);
+        } else if (moduleName.equals("LockModule")) {
+            return new LockModule(sensor);
+        } else if (moduleName.equals("PowerCalibrationModule")) {
+            return new PowerCalibrationModule(sensor);
+        } else if (moduleName.equals("PowerModule")) {
+            return new PowerModule(sensor);
+        } else {
             return null;
-
-        return creator.apply(sensor); // ritorna il sensore decorato
+        }
     }
 
     // ==============================

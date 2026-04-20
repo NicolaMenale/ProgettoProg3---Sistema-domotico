@@ -134,7 +134,7 @@ public class FileManager {
     private static Sensor applyDecorator(String moduleName, Sensor sensor) {
         try {
             moduleName = moduleName.trim();
-            String className = "decorator." + moduleName; // package decorator
+            String className = "decorator.modules." + moduleName; // package decorator
             Class<?> clazz = Class.forName(className);
             return (Sensor) clazz.getConstructor(Sensor.class).newInstance(sensor);
         } catch (Exception e) {

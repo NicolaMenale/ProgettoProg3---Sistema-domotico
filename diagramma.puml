@@ -1,0 +1,231 @@
+@startuml diagramma
+' =========================
+' Classi principali
+' =========================
+class HomeSystem {
+    -sensors: List<Sensor>
+    -monitoringToIntervention: Map<Sensor, Sensor>
+    -currentState: SystemState
+    -alarmQueue: Queue<Sensor>
+    -stopAlarmQueue: Queue<Sensor>
+    -currentAlarms: List<Sensor>
+    +HomeSystem(): void
+    +setState(state: SystemState)
+    +setCollaudoMode(): void
+    +installSensors(): void
+    +installMonitoringPair(monitorType: String, interventionType: String, threshold: int)
+    +addMonitoringPair(monitor: Sensor, intervention: Sensor)
+    +countSensorsByType(prefix: String)
+    +showSensorsS(): void
+    +showSensors(): void
+    +resetSensorByIdS(): void
+    +resetSensorById(id: String): boolean
+    +resetSensorsS(): void
+    +resetSensors(system: HomeSystem)
+    +installModules(): void
+    +addModuleToSensor(sensorId: String, moduleName: String): boolean
+    +showStatisticsS(): void
+    +showStatistics(): void
+    +setActiveMode(): void
+    +simulateSensorCycleS(): void
+    +simulateSensorCycle(): void
+    +getAlarmQueue(): void
+    +enqueueAlarm(): void
+    +enqueueStopAlarm(): void
+    +processAlarms(): void
+    +processStopAlarms(): void
+    +clearAlarmQueues(): void
+    +setSensors(sensors: List<Sensor>)
+    +rebuildMonitoringPairs(): void
+    +getSensorInfo(): List<String>
+    +getBaseSensor(sensor: Sensor): Sensor
+    +getSensorIdByIndex(index: int): String
+    +getAvailableModules(sensorId: String):List<String>
+    +getSensors(): List<Sensor>
+    +printPairSensor(): void
+}
+
+' =============================
+' CLASSI SENSORI
+' =============================
+
+abstract class Sensor {
+    -id: String
+    -active: boolean
+    -modeString: String
+    +setModeString(mode: String)
+    +getModeString(): String
+    +getId(): String
+    +isActive(): boolean
+    +activate(): void
+    +deactivate(): void
+    +reset(): void
+    +getStatistics(): String
+}
+
+class MonitoringSensor extends Sensor {
+    -threshold: int
+    -readings: List<Double>
+    -alarmHistory: List<LocalDateTime>
+    -lastAlarmTime: LocalDateTime
+    -alarmCount: int
+    +getThreshold(): int
+    +getReadings(): List<Double>
+    +getAlarmHistory(): List<LocalDateTime>
+    +getLastAlarmTime(): LocalDateTime
+    +getAlarmCount(): int
+    +isMonitoring(): boolean
+    +activate(): void
+    +deactivate(): void
+    +addReading(value: double): boolean
+    +reset(): void
+    +getStatistics(): String
+    +setActive(active: boolean): void
+    +setThreshold(threshold: int): void
+    +setAlarmCount(alarmCount: int): void
+    +setLastAlarmTime(lastAlarmTime: LocalDateTime): void
+}
+
+class InterventionSensor extends Sensor {
+    -activationCount: int
+    -lastActivationTime: LocalDateTime
+    -activationHistory: List<LocalDateTime>
+    +getActivationCount(): int
+    +getLastActivationTime(): LocalDateTime
+    +getActivationHistory(): List<LocalDateTime>
+    +activate(): void
+    +deactivate(): void
+    +trigger(): void
+    +reset(): void
+    +getStatistics(): String
+    +setActive(active: boolean): void
+    +setNumberOfActivations(activationCount: int): void
+}
+
+' =============================
+' CLASSI MODULI
+' =============================
+
+abstract class SensorDecorator extends Sensor {
+    -wrappedSensor: Sensor
+    -modules: List<String>
+    +getModuleName(): String
+    +getWrappedSensor(): Sensor
+    +getModules(): List<String>
+    +addModule(moduleName: String): void
+    +getBaseSensor(): Sensor
+    +reset(): void
+    +getStatistics(): String
+    +getBaseSensor(sensor: Sensor): Sensor
+}
+
+class ModuleRegistry {
+    -SENSOR_MODULES: Map<String, List<String>>
+    -MODULE_CREATORS: Map<String, Function<Sensor, Sensor>>
+
+    +getAvailableModules(sensor: Sensor): List<String>
+    +createModule(moduleName: String, sensor: Sensor): Sensor
+    +getBaseSensor(sensor: Sensor): Sensor
+    +getInstalledModules(sensor: Sensor): List<String>
+}
+
+' =============================
+' CLASSI FACTORY
+' =============================
+
+class SensorFactory {
+    +createSensor(id: String): Sensor
+    +instantiateSensor(id: String): Sensor
+}
+
+class SensorFactoryProvider {
+    +getFactory(sensorType: String): SensorFactory
+    +getFactory(sensorType: String, threshold: int): SensorFactory
+}
+
+class InterventionSensorFactory extends SensorFactory{
+    -threshold: int
+    +MonitoringSensorFactory(threshold: int)
+    +instantiateSensor(id: String): Sensor
+}
+
+class MonitoringSensorFactory extends SensorFactory{
+    +instantiateSensor(id: String): Sensor
+}
+
+' =============================
+' CLASSI STATI
+' =============================
+
+abstract class SystemState {
+    +installSensors(system: HomeSystem):void
+    +showSensors(system: HomeSystem):void
+    +resetSensorByIdS(system: HomeSystem):void
+    +resetSensorsS(system: HomeSystem):void
+    +installModules(system: HomeSystem):void
+    +showStatisticsS(system: HomeSystem):void
+    +simulateSensorCycleS(system: HomeSystem):void
+}
+
+class ActiveModeState extends SystemState{
+    +showSensors(system: HomeSystem):void
+    +showStatisticsS(system: HomeSystem):void
+    +simulateSensorCycleS(system: HomeSystem):void
+}
+
+class TestModeState extends SystemState{
+    +installSensors(system: HomeSystem):void
+    +showSensors(system: HomeSystem):void
+    +resetSensorByIdS(system: HomeSystem):void
+    +resetSensorsS(system: HomeSystem):void
+    +installModules(system: HomeSystem):void
+    +showStatisticsS(system: HomeSystem):void
+}
+
+' =========================
+' FILEMANAGER
+' =========================
+class FileManager {
+    -SENSOR_FILE: String
+    -STAT_FILE: String
+    +saveSensors(sensors: List<Sensor>): void
+    +getBaseSensor(sensor: Sensor): Sensor
+    +loadSensors(): List<Sensor>
+    +applyDecorator(moduleName: String, sensor: Sensor): Sensor
+    +saveStatistics(sensors: List<Sensor>): void
+    +loadStatistics(sensors: List<Sensor>): void
+    +clearDataFiles(): void
+}
+
+' =========================
+' RELAZIONI
+' =========================
+
+' HomeSystem gestisce sensori
+HomeSystem "1" --> "*" Sensor : manages
+
+' HomeSystem usa Factory per creare sensori
+HomeSystem ..> SensorFactoryProvider : uses
+
+' HomeSystem ha UNO stato corrente
+HomeSystem "1" --> "1" SystemState : currentState
+
+' HomeSystem usa ModuleRegistry
+HomeSystem ..> ModuleRegistry
+
+' SensorFactoryProvider restituisce factory
+SensorFactoryProvider "1" --> "*" SensorFactory : provides
+
+' Decorator WRAPPA un sensore (composizione forte)
+SensorDecorator *-- Sensor : wraps
+
+MonitoringSensorFactory ..> MonitoringSensor : creates
+InterventionSensorFactory ..> InterventionSensor : creates
+
+' ModuleRegistry crea decoratori
+ModuleRegistry --> SensorDecorator : creates
+
+' FileManager usa Sensor
+FileManager ..> Sensor
+
+@enduml

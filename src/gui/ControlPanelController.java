@@ -298,19 +298,17 @@ public class ControlPanelController {
 
     @FXML
     private void simulateCycle() {
-        try {
-            system.simulateSensorCycleS(); // verifica stato
-
-            List<String> logs = system.simulateSensorCycle(); // esegue ciclo sensori
-            alarmQueue(); // aggiorna lista allarmi attivi
-            for (String log : logs) {
-                addLog(log); // scrive log eventi
-            }
-            refreshSensorList(); // aggiorna tabella
-        } catch (IllegalStateException e) {
-            logArea.appendText(e.getMessage() + "\n");
+    try {
+        List<String> logs = system.simulateSensorCycleS(); // fa tutto in uno
+        alarmQueue();
+        for (String log : logs) {
+            addLog(log);
         }
+        refreshSensorList();
+    } catch (IllegalStateException e) {
+        logArea.appendText(e.getMessage() + "\n");
     }
+}
 
     // ==============================
     // GESTIONE CODA ALLARMI
