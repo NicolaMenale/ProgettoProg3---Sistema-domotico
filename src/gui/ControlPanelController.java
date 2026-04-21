@@ -247,7 +247,7 @@ public class ControlPanelController {
     @FXML
     private void openResetWindow() throws IOException {
         try {
-            system.resetSensorsS(); // verifica permessi stato
+            system.resetS(); // verifica permessi stato
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ResetView.fxml"));
             Parent root = loader.load();
@@ -296,10 +296,13 @@ public class ControlPanelController {
     // SIMULAZIONE CICLO SENSORI
     // ==============================
 
+    /**
+     * Avvia la simulazione
+     */
     @FXML
     private void simulateCycle() {
     try {
-        List<String> logs = system.simulateSensorCycleS(); // fa tutto in uno
+        List<String> logs = system.simulateSensorCycleS();
         alarmQueue();
         for (String log : logs) {
             addLog(log);
@@ -365,6 +368,9 @@ public class ControlPanelController {
     // CHIUSURA APPLICAZIONE
     // ==============================
 
+    /**
+     * Gestione salvataggio dati alla chiusura
+     */
     @FXML
     public void closeApp() {
         system.setCollaudoMode(); // imposta stato sicuro

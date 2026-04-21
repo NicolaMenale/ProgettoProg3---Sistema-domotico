@@ -177,8 +177,8 @@ public class Main {
     // ==============================
     private static void resetSensorsMenu(HomeSystem system) {
 
-        // Controlla se lo stato attuale del sistema permette il reset dei sensori
-        system.resetSensorByIdS();
+        // Controlla se lo stato attuale del sistema permette il reset
+        system.resetS();
 
         boolean back = false; // flag per uscire dal menu
 
@@ -232,7 +232,7 @@ public class Main {
 
                     // Resetta il sensore tramite HomeSystem
                     if (sensorId != null) {
-                        boolean success = system.resetSensorById(sensorId);
+                        boolean success = system.resetPairById(sensorId);
                         if (success)
                             System.out.println("Coppia Resettata");
                         else
@@ -241,20 +241,13 @@ public class Main {
                 }
 
                 case 2 -> { // reset tutti i sensori
-
                     // HomeSystem gestisce internamente il reset completo
-                    system.resetSensorsS();
+                    system.resetSensors(system);
                     System.out.println("Tutti i sensori e moduli sono stati resettati.");
                 }
 
                 case 3 -> { // cancellazione totale
-
-                    // Cancella tutti i dati dai file
-                    FileManager.clearDataFiles();
-
-                    // Rimuove tutti i sensori dalla memoria
-                    system.getSensors().clear();
-
+                    system.resetData(system);
                     System.out.println("Sistema resettato.");
                 }
 

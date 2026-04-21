@@ -33,8 +33,18 @@ public abstract class SystemState {
         throw new IllegalStateException("Operazione non consentita nello stato corrente");
     }
 
-    /** Resetta un singolo sensore dato l'ID */
-    public void resetSensorByIdS(HomeSystem system) {
+    /** Apertura menu reset */
+    public void resetS(HomeSystem system) {
+        throw new IllegalStateException("Operazione non consentita nello stato corrente");
+    }
+
+    /** Svuota i file sensors e statistics */
+    public void resetDataS(HomeSystem system) {
+        throw new IllegalStateException("Operazione non consentita nello stato corrente");
+    }
+
+    /** Resetta una coppia di sensori dato l'ID */
+    public void resetPairByIdS(HomeSystem system) {
         throw new IllegalStateException("Operazione non consentita nello stato corrente");
     }
 

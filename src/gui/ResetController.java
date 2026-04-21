@@ -1,16 +1,12 @@
 package gui;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import main.HomeSystem;
 import models.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import data.FileManager;
+import java.util.HashMap;
+import java.util.Map;
 
 // ==============================
 // CONTROLLER: RESET SENSORI
@@ -22,15 +18,29 @@ import data.FileManager;
 //
 public class ResetController {
 
-    // ComboBox contenente gli ID dei sensori disponibili
+    /**
+     * ComboBox contenente gli ID dei sensori disponibili
+     */
     @FXML
     private ComboBox<String> sensorComboBox;
-
-    // Riferimento al sistema domotico principale
+    
+    /**
+     * Riferimento al sistema domotico principale
+     */
     private HomeSystem system;
 
-    // Riferimento al controller principale della GUI
+    /**
+     * Riferimento al controller principale della GUI
+     */
     private ControlPanelController mainController;
+
+    /**
+     * Mappa che associa la rappresentazione testuale della coppia
+     * (monitor -> intervention) mostrata nella ComboBox
+     * all'ID del sensore monitor corrispondente.
+     * Serve per recuperare il dato logico a partire dalla selezione UI.
+     */
+    private Map<String, String> pairMap = new HashMap<>();
 
     // ==============================
     // SETTER / INIZIALIZZAZIONE
@@ -51,52 +61,80 @@ public class ResetController {
         this.mainController = controller;
     }
 
-    // Popola la ComboBox con tutti gli ID dei sensori presenti nel sistema
+    /**
+     * Popola la ComboBox con tutti gli ID dei sensori presenti nel sistema
+     */
     private void populateSensorComboBox() {
-        // ottiene gli ID dei sensori
-        List<String> sensorIds = system.getSensors().stream().map(Sensor::getId).collect(Collectors.toList());
-        sensorComboBox.setItems(FXCollections.observableArrayList(sensorIds));
-        if (!sensorIds.isEmpty())
-            sensorComboBox.getSelectionModel().selectFirst(); // seleziona il primo elemento
-    }
+        sensorComboBox.getItems().clear();
+        pairMap.clear(); // se vuoi ancora mappare display -> monitorId
 
+        for (Map.Entry<Sensor, Sensor> entry : system.getMonitoringPairs().entrySet()) {
+
+            Sensor monitor = entry.getKey();
+            Sensor intervention = entry.getValue();
+
+            String monitorId = monitor.getId();
+            String interventionId = intervention.getId();
+
+            String display = monitorId + " -> " + interventionId;
+
+            sensorComboBox.getItems().add(display);
+
+            // utile: recuperi il monitorId quando selezioni la combo
+            pairMap.put(display, monitorId);
+        }
+
+        if (!sensorComboBox.getItems().isEmpty()) {
+            sensorComboBox.getSelectionModel().selectFirst();
+        }
+    }
     // ==============================
     // AZIONI SUI SENSORI
     // ==============================
 
-    // Resetta un singolo sensore selezionato nella ComboBox
+    /**
+     * Resetta un singolo sensore selezionato nella ComboBox
+     */
     @FXML
-    private void resetSingleSensor() {
-        String sensorId = sensorComboBox.getSelectionModel().getSelectedItem();
-        if (sensorId != null) {
-            boolean success = system.resetSensorById(sensorId); // HomeSystem gestisce il reset completo
-            if (success) {
-                System.out.println("Coppia Resettata");
-            } else {
-                System.out.println("Errore nel resettare il sensore " + sensorId);
+    private void resetPairSensor() {
+        String selected = sensorComboBox.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            String monitorId = pairMap.get(selected);
+            if (monitorId != null) {
+                boolean success = system.resetPairById(monitorId);
+                if (success) {
+                    System.out.println("Coppia Resettata");
+                } else {
+                    System.out.println("Errore reset sensore " + monitorId);
+                }
             }
         }
-        mainController.refreshSensorList(); // aggiorna la tabella dei sensori nella GUI principale
+
+        mainController.refreshSensorList();
     }
 
-    // Resetta tutti i sensori presenti nel sistema
+    /**
+     * Resetta tutti i sensori presenti nel sistema
+     */
     @FXML
     private void resetAllSensors() {
-        system.resetSensorsS(); // HomeSystem gestisce internamente il reset
+        system.resetSensors(system); // HomeSystem gestisce internamente il reset
         mainController.refreshSensorList(); // aggiorna la tabella dei sensori
     }
 
-    // Cancella completamente il sistema: svuota i dati e la memoria dei sensori
+    /**
+     * Cancella completamente il sistema: svuota i dati e la memoria dei sensori
+     */
     @FXML
     private void clearSystem() {
-        FileManager.clearDataFiles(); // cancella file nella cartella dati
-        system.getSensors().clear();  // rimuove tutti i sensori dalla memoria
-        System.out.println("Sistema resettato completamente.");
+        system.resetData(system);
         populateSensorComboBox(); // aggiorna ComboBox
         mainController.refreshSensorList(); // aggiorna la tabella nella GUI principale
     }
 
-    // Chiude la finestra del reset
+    /**
+     * Chiude la finestra del reset
+     */
     @FXML
     private void closeWindow() {
         Stage stage = (Stage) sensorComboBox.getScene().getWindow();

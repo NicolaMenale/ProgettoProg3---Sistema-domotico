@@ -26,11 +26,13 @@ public class HomeSystem {
     private SystemState currentState; // stato corrente del sistema (Collaudo, Attivato)
     private Queue<Sensor> alarmQueue = new LinkedList<>(); // coda degli allarmi attivi
     private Queue<Sensor> stopAlarmQueue = new LinkedList<>(); // coda per stop allarmi
-    List<Sensor> currentAlarms; // lista degli allarmi correnti
 
     // ==============================
     // COSTRUTTORE
     // ==============================
+    /**
+     * Costruttore Homesystem
+     */
     public HomeSystem() {
         sensors = new ArrayList<>();
     }
@@ -38,6 +40,9 @@ public class HomeSystem {
     // ==============================
     // STATO DEL SISTEMA
     // ==============================
+    /**
+     * Imposta lo stato del sistema
+     */
     public void setState(SystemState state) {
         this.currentState = state; // imposta lo stato corrente
     }
@@ -45,6 +50,9 @@ public class HomeSystem {
     // ==============================
     // MODALITÀ COLLAUDO
     // ==============================
+    /**
+     * Cambia la modalità in Collaudo
+     */
     public void setCollaudoMode() {
         System.out.println("Modalità Collaudo: tutti i sensori disattivati.");
         for (Sensor s : sensors) {
@@ -57,7 +65,9 @@ public class HomeSystem {
     // INSTALLAZIONE SENSORI
     // ==============================
 
-    // Richiama la logica dello stato corrente
+    /**
+     * Chiama lo stato corrente per installare i sensori (delegazione allo State)
+     */
     public void installSensorsS() {
         currentState.installSensorsS(this);
     }
@@ -69,11 +79,13 @@ public class HomeSystem {
 
         // Crea il sensore di monitoraggio tramite factory
         SensorFactory monitorFactory = SensorFactoryProvider.getFactory(monitorType, threshold);
-        Sensor monitorSensor = monitorFactory.createSensor(monitorType + (countSensorsByType(monitorType) + 1)); // ID progressivo
+        Sensor monitorSensor = monitorFactory.createSensor(monitorType + (countSensorsByType(monitorType) + 1)); // ID
+                                                                                                                 // progressivo
 
         // Crea il sensore di intervento tramite factory
         SensorFactory interventionFactory = SensorFactoryProvider.getFactory(interventionType);
-        Sensor interventionSensor = interventionFactory.createSensor(interventionType + (countSensorsByType(interventionType) + 1)); // ID progressivo
+        Sensor interventionSensor = interventionFactory
+                .createSensor(interventionType + (countSensorsByType(interventionType) + 1)); // ID progressivo
 
         // Aggiunge i sensori alla lista del sistema
         sensors.add(monitorSensor);
@@ -102,6 +114,13 @@ public class HomeSystem {
 
         // Inserimento nella mappa
         monitoringToIntervention.put(monitor, intervention);
+    }
+
+    /**
+     * Restituisce la mappa sensore monitoraggio -> intervento
+     */
+    public Map<Sensor, Sensor> getMonitoringPairs() {
+        return monitoringToIntervention;
     }
 
     /**
@@ -179,34 +198,37 @@ public class HomeSystem {
     // =========================
     // RESET SENSORI
     // =========================
+    /**
+     * Chiama lo stato corrente per entrare nel menu reset (delegazione allo State)
+     */
+    public void resetS() {
+        currentState.resetS(this);
+    }
 
     /**
-     * Chiama lo stato corrente per gestire reset sensore singolo
+     * Chiama lo stato corrente per gestire reset coppia di sensori
      */
-    public void resetSensorByIdS() {
-        currentState.resetSensorByIdS(this);
+    public void resetPairByIdS() {
+        currentState.resetPairByIdS(this);
     }
 
     /**
      * Reset di coppia di sensori tramite ID
      */
-    public boolean resetSensorById(String id) {
+    public boolean resetPairById(String id) {
         for (int j = 0; j < sensors.size(); j++) {
-            Sensor s = getBaseSensor(sensors.get(j)); // ottieni sensore base
-            if (s.getId().equals(id)) {
-                // reset monitoraggio + moduli
-                sensors.get(j).reset();
-
-                // reset intervento associato se esiste
-                Sensor intervention = monitoringToIntervention.get(s);
-                if (intervention != null) {
-                    // trova l’indice del sensore decorato nella lista
-                    int idx = sensors.indexOf(intervention);
-                    if (idx != -1) {
-                        sensors.get(idx).reset(); // reset intervento + moduli (se decorato)
-                    }
+        Sensor monitor = sensors.get(j);
+        Sensor base = getBaseSensor(monitor);
+        if (base.getId().equals(id)) {
+            monitor.reset();
+            Sensor intervention = monitoringToIntervention.get(base);
+            if (intervention != null) {
+                int idx = sensors.indexOf(intervention);
+                if (idx != -1) {
+                    sensors.get(idx).reset();
                 }
-
+            }
+                removePairFromQueues(monitor, intervention);
                 return true;
             }
         }
@@ -225,6 +247,26 @@ public class HomeSystem {
      */
     public void resetSensors(HomeSystem system) {
         system.getSensors().forEach(Sensor::reset);
+        clearAlarmQueues();
+    }
+    
+    /**
+     * Chiama lo stato corrente gestire lo svuotamento dei file sensors e statistics (delegazione allo State)
+     */
+    public void resetDataS() {
+        currentState.resetDataS(this);
+    }
+
+    /**
+     * Svuotamento dei file sensors e statistics
+     */
+    public void resetData(HomeSystem system) {
+        // Cancella tutti i dati dai file
+        FileManager.clearDataFiles();
+
+        // Rimuove tutti i sensori dalla memoria
+        this.getSensors().clear();
+        this.clearAlarmQueues();
     }
 
     // =========================
@@ -404,7 +446,6 @@ public class HomeSystem {
         }
 
         // Aggiorna lista allarmi correnti
-        currentAlarms = new ArrayList<>(alarmQueue);
 
         // Processa code di allarmi attivi e cessati
         processAlarms();
@@ -417,13 +458,6 @@ public class HomeSystem {
         logs.add("------------------------------------------");
         System.out.println("------------------------------------------");
         return logs;
-    }
-
-    /**
-     * Restituisce gli allarmi attivi
-     */
-    public List<Sensor> getAlarmQueue() {
-        return new ArrayList<>(currentAlarms);
     }
 
     /**
@@ -497,6 +531,17 @@ public class HomeSystem {
         alarmQueue.clear();
         stopAlarmQueue.clear();
         System.out.println("Code di allarme resettate.");
+    }
+
+    /**
+     * Rimuovi gli allarmi solo di una coppia di sensori
+     */
+    private void removePairFromQueues(Sensor monitor, Sensor intervention) {
+        alarmQueue.remove(monitor);
+        alarmQueue.remove(intervention);
+
+        stopAlarmQueue.remove(monitor);
+        stopAlarmQueue.remove(intervention);
     }
 
     // =========================

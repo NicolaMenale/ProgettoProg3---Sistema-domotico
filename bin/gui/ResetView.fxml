@@ -17,7 +17,7 @@
     <HBox xmlns="http://javafx.com/javafx/21.0.0" spacing="10" alignment="CENTER_LEFT">
         <Label text="Sensore singolo:" />
         <ComboBox fx:id="sensorComboBox" prefWidth="250"/>
-        <Button text="Reset" onAction="#resetSingleSensor"/>
+        <Button text="Reset" onAction="#resetPairSensor"/>
     </HBox>
 
     <!-- Reset tutti i sensori -->

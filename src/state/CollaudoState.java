@@ -37,12 +37,28 @@ public class CollaudoState extends SystemState {
     }
 
     // =============================
+    // VISUALIZZAZIONE SENSORI
+    // =============================
+
+    /** In modalità test, l'apertura del menu reset va avanti normalmente */
+    @Override
+    public void resetS(HomeSystem system){
+        // Nessuna restrizione: HomeSystem gestisce il reset
+    }
+
+    /** In modalità test, la cancellazione del contenuto dei file sensors e statistics è consentito */
+    @Override
+    public void resetDataS(HomeSystem system){
+        system.resetData(system);
+    }
+
+    // =============================
     // RESET SINGOLO SENSOR
     // =============================
 
-    /** In modalità test, il reset di un singolo sensore va avanti normalmente */
+    /** In modalità test, il reset di una coppia di sensori va avanti normalmente */
     @Override
-    public void resetSensorByIdS(HomeSystem system){
+    public void resetPairByIdS(HomeSystem system){
         // Nessuna restrizione: HomeSystem gestisce il reset
     }
 
@@ -70,7 +86,7 @@ public class CollaudoState extends SystemState {
     // STATISTICHE SENSORI
     // =============================
 
-    /** Mostra le statistiche di tutti i sensori */
+    /** In modalità test, mostrare le statistiche di tutti i sensori è consentito */
     @Override
     public void showStatisticsS(HomeSystem system){
         system.showStatistics();

@@ -21,7 +21,9 @@ public class ModuleRegistry {
     // MODULI DISPONIBILI PER TIPO SENSORE
     // ==============================
 
-    // Mappa tra tipo base sensore e lista dei moduli disponibili
+    /**
+     * Mappa tra tipo base sensore e lista dei moduli disponibili
+     */
     private static final Map<String, List<String>> SENSOR_MODULES = new HashMap<>();
     static {
         // Sensori di monitoraggio
@@ -57,6 +59,109 @@ public class ModuleRegistry {
                 "LoggingModule", "LockModule", "NotificationModule"));
     }
 
+    /**
+     * Mappa di factory per la creazione dinamica dei moduli (decoratori) applicabili ai sensori.
+     * Ogni chiave rappresenta il nome logico del modulo, mentre il valore è un moduleCreator che si occupa di istanziare il
+     * relativo decoratore.
+     *
+     * Questa struttura evita l'uso di lunghe catene di if/else o switch, centralizzando la creazione
+     * dei moduli e rendendo il sistema facilmente estendibile: per aggiungere un
+     * nuovo modulo è sufficiente registrarlo nella mappa.
+     */
+    private static final Map<String, ModuleCreator> MODULE_CREATORS = new HashMap<>();
+    static {
+        MODULE_CREATORS.put("AlarmModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new AlarmModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("AnalyticsModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new AnalyticsModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("AudioModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new AudioModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("FlowMonitoringModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new FlowMonitoringModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("GasLeakModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new GasLeakModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("LockModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new LockModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("LoggingModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new LoggingModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("NotificationModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new NotificationModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("PowerCalibrationModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new PowerCalibrationModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("PowerModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new PowerModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("RemoteControlModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new RemoteControlModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("SensorCalibrationModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new SensorCalibrationModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("SmokeDetectionModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new SmokeDetectionModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("VentModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new VentModule(sensor);
+            }
+        });
+        MODULE_CREATORS.put("VideoModule", new ModuleCreator() {
+            @Override
+            public Sensor create(Sensor sensor) {
+                return new VideoModule(sensor);
+            }
+        });
+    }
+
     // ==============================
     // METODI PUBBLICI
     // ==============================
@@ -86,39 +191,12 @@ public class ModuleRegistry {
      * Crea un modulo decoratore a partire dal nome del modulo
      */
     public static Sensor createModule(String moduleName, Sensor sensor) {
-        if (moduleName.equals("AudioModule")) {
-            return new AudioModule(sensor);
-        } else if (moduleName.equals("VideoModule")) {
-            return new VideoModule(sensor);
-        } else if (moduleName.equals("NotificationModule")) {
-            return new NotificationModule(sensor);
-        } else if (moduleName.equals("LoggingModule")) {
-            return new LoggingModule(sensor);
-        } else if (moduleName.equals("SensorCalibrationModule")) {
-            return new SensorCalibrationModule(sensor);
-        } else if (moduleName.equals("AnalyticsModule")) {
-            return new AnalyticsModule(sensor);
-        } else if (moduleName.equals("SmokeDetectionModule")) {
-            return new SmokeDetectionModule(sensor);
-        } else if (moduleName.equals("GasLeakModule")) {
-            return new GasLeakModule(sensor);
-        } else if (moduleName.equals("RemoteControlModule")) {
-            return new RemoteControlModule(sensor);
-        } else if (moduleName.equals("AlarmModule")) {
-            return new AlarmModule(sensor);
-        } else if (moduleName.equals("FlowMonitoringModule")) {
-            return new FlowMonitoringModule(sensor);
-        } else if (moduleName.equals("VentModule")) {
-            return new VentModule(sensor);
-        } else if (moduleName.equals("LockModule")) {
-            return new LockModule(sensor);
-        } else if (moduleName.equals("PowerCalibrationModule")) {
-            return new PowerCalibrationModule(sensor);
-        } else if (moduleName.equals("PowerModule")) {
-            return new PowerModule(sensor);
-        } else {
-            return null;
+        ModuleCreator creator = MODULE_CREATORS.get(moduleName);
+        if (creator == null) {
+            System.out.println("Modulo non trovato: " + moduleName);
+            return sensor; // NON null
         }
+        return creator.create(sensor);
     }
 
     // ==============================
