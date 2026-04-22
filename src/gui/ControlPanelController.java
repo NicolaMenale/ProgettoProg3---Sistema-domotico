@@ -205,6 +205,8 @@ public class ControlPanelController {
             Sensor base = getBaseSensor(cell.getValue());
             if (base instanceof MonitoringSensor m) {
                 return new SimpleStringProperty(m.getAlarmHistory().toString());
+            } else if (base instanceof InterventionSensor i) {
+                return new SimpleStringProperty(i.getActivationHistory().toString());
             }
             return new SimpleStringProperty("-");
         });
@@ -301,17 +303,17 @@ public class ControlPanelController {
      */
     @FXML
     private void simulateCycle() {
-    try {
-        List<String> logs = system.simulateSensorCycleS();
-        alarmQueue();
-        for (String log : logs) {
-            addLog(log);
+        try {
+            List<String> logs = system.simulateSensorCycleS();
+            alarmQueue();
+            for (String log : logs) {
+                addLog(log);
+            }
+            refreshSensorList();
+        } catch (IllegalStateException e) {
+            logArea.appendText(e.getMessage() + "\n");
         }
-        refreshSensorList();
-    } catch (IllegalStateException e) {
-        logArea.appendText(e.getMessage() + "\n");
     }
-}
 
     // ==============================
     // GESTIONE CODA ALLARMI
