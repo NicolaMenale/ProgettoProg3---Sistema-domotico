@@ -1,6 +1,0 @@
-{
-    "java.dependency.packagePresentation": "hierarchical",
-    "java.project.referencedLibraries": [
-    "/Users/nicolamenale/javafx-sdk-21.0.10/lib/*.jar"
-  ]
-}
